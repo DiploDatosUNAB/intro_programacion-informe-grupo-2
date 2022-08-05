@@ -1,36 +1,157 @@
 ---
-title: "titulo"
-author: "nombres"
+title: "Presentes"
+author: "Alberto Fernandez y Clara Bonpland Mignaquy"
 output: html_document
 ---
 
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-# Cargar los paquetes necesarios acá
+library(presentes)
+library(dplyr)
+library(ggplot2)
 ```
 
-
 ## Introducción
+Esta sección consiste en entre 2 y 3 párrafos describiendo los datos.
+Qué decir sobre los datos dependerá de los datos elegidos pero algunos detalles posibles son:
+
+-   ¿Qué datos son?
+-   ¿De dónde provienen? ¿Quién los tomó?
+-   ¿En qué período se tomaron?
 
 
+El presente informe consiste en el análisis de los datos del paquete "presentes", que incluye la información oficial sobre víctimas de la dictadura militar entre el 24 de marzo de 1976 y el 10 de diciembre de 1983 en Argentina. 
+sumar si tomamos victimas de años anteriores
+Precisamente se ha hecho hincapié en observar las relaciones  (lo completamos cuando tengamos los graficos)
+No queremos dejar de mencionar que, más allá de que los datos recabados indican un número de 8753 victimas, existe un gran número de victimas desaparecidas y asesinadas que aún no han podido ser identificadxs.
+
+fuentes
 
 ## Exploración de los datos
 
+Esta sección es una primera exploracion de los datos.
+¿Qué variables tiene? 
+¿Cuántas observaciones hay?
+¿Cuántas variables?
+
 
 ```{r}
-# Código para cargar o leer los datos
+parque_de_la_memoria <- presentes::parque_de_la_memoria
+```
+
+```{r}
+victimas_accionar_represivo_ilegal <- presentes::victimas_accionar_represivo_ilegal
+```
+
+convierto dataframe de parque de la memoria en victimas, el primer chunk se puede borrar
+```{r}
+victimas <- select(parque_de_la_memoria, id, edad, fecha_de_secuestro, lugar_de_secuestro, ocupaciones)
+victimas
+```
+
+```{r}
+str(victimas)
+```
+
+----
+
+convierto dataframe de victimas_accionar_represivo_ilegal en victimas2, el segundo chunk se puede borrar
+```{r}
+victimas2 <- select(victimas_accionar_represivo_ilegal, id_unico_ruvte, edad_al_momento_del_hecho_numerico, fecha_detencion_secuestro, lugar_detencion_secuestro,provincia_nacimiento, tipificacion_ruvte)
+```
+
+```{r}
+str(victimas2)
+```
+empiezo a explorar victimas2(empecé por este porque tiene la edad como dato numerico, en el caso de victimas el numero está como caracter)
+
+cantidad de victimas por edad
+```{r}
+victimas2 %>% 
+  group_by(edad_al_momento_del_hecho_numerico) %>% 
+  summarise(cantidad = n()) %>% 
+  arrange(desc(cantidad)) %>% 
+  ggplot(aes(edad_al_momento_del_hecho_numerico, cantidad))+
+  geom_col(aes(color = edad_al_momento_del_hecho_numerico))
+```
+edad maxima
+```{r}
+victimas2 %>% 
+  summarise(edad_max = max(edad_al_momento_del_hecho_numerico, na.rm = TRUE))
+```
+
+
+argupado max, min, media,ds
+```{r}
+victimas2 %>% 
+  summarise(edad_max = max(edad_al_momento_del_hecho_numerico, na.rm = TRUE), edad_min = min(edad_al_momento_del_hecho_numerico, na.rm = TRUE), edad_media = mean(edad_al_momento_del_hecho_numerico, na.rm = TRUE), edad_sd = sd(edad_al_momento_del_hecho_numerico, na.rm = TRUE))
+```
+
+lugar de secuestro, dejando de lado los datos faltantes(na)
+```{r}
+victimas2 %>% 
+  filter(!is.na(lugar_detencion_secuestro)) %>% 
+  group_by(lugar_detencion_secuestro) %>% 
+  summarise(cantidad_lugar = n()) %>% 
+  arrange(desc(cantidad_lugar)) 
+```
+grafico victimas > 200 por lugar de secuestro, dejando de lado los na
+```{r}
+victimas2 %>% 
+  filter(!is.na(lugar_detencion_secuestro)) %>% 
+  group_by(lugar_detencion_secuestro) %>% 
+  summarise(cantidad_lugar = n()) %>% 
+  filter(cantidad_lugar > 200) %>% 
+  arrange(desc(cantidad_lugar)) %>% 
+  ggplot(aes(lugar_detencion_secuestro, cantidad_lugar))+
+  geom_col(aes(color = lugar_detencion_secuestro))
+```
+
+
+contando la cantidad de datos faltantes
+```{r}
+victimas2 %>% 
+  summarise(cantidad_nas_lugar_secuestro = sum(is.na(lugar_detencion_secuestro)))
 ```
 
 
 
+Seleccioná algunas variables resulten interesantes y mostrá sus propiedades.
+Algunas cosas para mostrar:
+
+-   ¿Cuál es su valor medio y desvío estándard?
+-   ¿Cuál es su rango (valor máximo y valor mínimo)?
+-   ¿Hay alguna anomalía que sugiera que hay datos incorrectos? Valores imposibles (como valores negativos en una variable que sólo puede ser positiva) o poco creíbles.
+-   ¿Cuántas observaciones hay por cada grupo? ¿Cuántos valores faltantes? ¿Hay diferencias?
+
+Esta sección sí tiene que tener código de R.
+
+Los resultados del código tienen que estar acompañados de un texto que los describa y que elabore sobre los mismos.
+Es decir, no sólo repetir lo que se ve, sino también comentar sobre su significado en el contexto de estos datos.
+No hace falta que sean párrafos largos; cada uno no debería tener más de 5-6 frases.
+
 ```{r}
-# Cödigo de R acá 
-# Agregá más bloques según sea necesario
+victimas %>% 
+  group_by(lugar_de_secuestro) %>% 
+  summarise(cantidad = n()) %>% 
+  arrange(desc(cantidad))
 ```
 
+```{r}
+victimas %>% 
+  group_by(edad) %>% 
+  summarise(cantidad = n()) %>% 
+  arrange(desc(cantidad))
+```
 
 
 ## Hipótesis
 
+Finalmente, esta sección contiene **al menos 3** hipótesis o preguntas que puedan ser respondidas a partir de los datos.
+Éstas tienen que ser más o menos interesantes y no cosas que se hayan respondido con la exploración anterior.
 
+Traten de que sean hipótesis o preguntas que relacionen 2 o más variables.
+Por ejemplo, "¿Cuál es el mes con más turistas en una región?" no es una pregunta intersante, pero "Existe una relación entre la cantidad de visitas y la cantidad de hoteles en una región" es una hipótesis más jugosa que apunta a la relación entre varias variables y a un fenómeno subyacente que puede tener implicancia y aplicaciones.
+
+**No tienen que responder** estas preguntas en esta entrega.
