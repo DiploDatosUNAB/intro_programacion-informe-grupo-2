@@ -14,11 +14,13 @@ library(dplyr)
 ## Introducción
 
 El presente informe consiste en el análisis de los datos del paquete "presentes", el cual reúne la información oficial sobre víctimas de la dictadura militar entre el 24 de marzo de 1976 y el 10 de diciembre de 1983 en Argentina. 
-Las fuentes principales de los datos del paquete provienen del Registro Único de Víctimas del Terrorismo de Estado (RUVTE) y del Monumento a las Víctimas del Terrorismo de Estado. 
+Las fuentes principales de los datos del paquete provienen del Registro Único de Víctimas del Terrorismo de Estado (RUVTE),dependiente de la Secretaría de Derechos Humanos y Pluralismo Cultural del Ministerio de Justicia y Derechos Humanos de la Nación y del,  Monumento a las Víctimas del Terrorismo de Estado, realizado por el Consejo de Gestión del Parque de la Memoria y del Monumento a las Víctimas del Terrorismo de Estado, creado por la ley 3078 de la Ciudad de Buenos Aires.
 
-En el informe haremos hincapié en observar las relaciones  (lo completamos cuando tengamos los graficos)
+Ambos registros recogen información de víctimas asesinadas o detenidas/desaparecidas aún antes de la fecha del inicio formal del golpe de estado militar.
 
-No queremos dejar de mencionar que, más allá de que los datos recabados indican un número de 8753 victimas, existe un gran número de victimas desaparecidas y asesinadas que aún no han podido ser identificadxs.
+En el informe haremos hincapié en observar las variables de edad de las víctimas, cuáles fueron las ciudad donde sucedió el secuestro, las ocupaciones de las victimas y los centros clandestinos de detención de las víctimas.
+
+No queremos dejar de mencionar que, más allá de que los datos recabados indican un número de 8753 victimas, existe un gran número de victimas desaparecidas que aún no han podido ser identificadxs.
 
 
 ## Exploración de los datos
@@ -32,7 +34,6 @@ centros_clandestinos <- presentes::centros_clandestinos_detencion
 
 ```
 
-
 Selección de variables del dataframe victimas_parque:
 ```{r}
 victimas_parque <- select(parque_de_la_memoria, id, edad, fecha_de_secuestro, lugar_de_secuestro, ocupaciones, sexo)
@@ -42,8 +43,7 @@ Exploramos las especificaciones del dataframe
 str(victimas_parque)
 ```
 
-
-Exploro datos de victimas_parque
+Exploración datos de victimas_parque
 
 Exploración sexo de las víctimas
 ```{r}
@@ -161,9 +161,10 @@ centros_clandestinos %>%
   summarise(distrib_propiedad_fuerza = n()) %>% 
   arrange(desc(distrib_propiedad_fuerza))
 ```
-Exploro por ubicación del centro clandestino
+Exploro por ubicación del centro clandestino. LE TENGO QUE PREGUNTAR A ELIO COMO FILTRAR POR PALABRA CLAVE, PARA QUE TOME LA PROVINCIA O CIUDAD
 ```{r}
-
+centros_clandestinos %>% 
+    group_by(ubicacion)
 ```
 
 
@@ -181,3 +182,6 @@ Traten de que sean hipótesis o preguntas que relacionen 2 o más variables.
 Por ejemplo, "¿Cuál es el mes con más turistas en una región?" no es una pregunta intersante, pero "Existe una relación entre la cantidad de visitas y la cantidad de hoteles en una región" es una hipótesis más jugosa que apunta a la relación entre varias variables y a un fenómeno subyacente que puede tener implicancia y aplicaciones.
 
 **No tienen que responder** estas preguntas en esta entrega.
+
+
+
