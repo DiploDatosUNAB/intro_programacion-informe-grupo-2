@@ -9,10 +9,10 @@
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
-<meta name="author" content="nombres" />
+<meta name="author" content="Alberto Fernandez y Clara Bonpland Mignaquy" />
 
 
-<title>titulo</title>
+<title>Presentes</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -362,23 +362,320 @@ pre code {
 
 
 
-<h1 class="title toc-ignore">titulo</h1>
-<h4 class="author">nombres</h4>
+<h1 class="title toc-ignore">Presentes</h1>
+<h4 class="author">Alberto Fernandez y Clara Bonpland Mignaquy</h4>
 
 </div>
 
 
 <div id="introducción" class="section level2">
 <h2>Introducción</h2>
+<p>El presente informe consiste en el análisis de los datos del paquete
+“presentes”, el cual reúne la información oficial sobre víctimas de la
+dictadura militar entre el 24 de marzo de 1976 y el 10 de diciembre de
+1983 en Argentina. Las fuentes principales de los datos del paquete
+provienen del Registro Único de Víctimas del Terrorismo de Estado
+(RUVTE) y del Monumento a las Víctimas del Terrorismo de Estado.</p>
+<p>En el informe haremos hincapié en observar las relaciones (lo
+completamos cuando tengamos los graficos)</p>
+<p>No queremos dejar de mencionar que, más allá de que los datos
+recabados indican un número de 8753 victimas, existe un gran número de
+victimas desaparecidas y asesinadas que aún no han podido ser
+identificadxs.</p>
 </div>
 <div id="exploración-de-los-datos" class="section level2">
 <h2>Exploración de los datos</h2>
-<pre class="r"><code># Código para cargar o leer los datos</code></pre>
-<pre class="r"><code># Cödigo de R acá 
-# Agregá más bloques según sea necesario</code></pre>
+<pre class="r"><code>victimas_parque &lt;- presentes::parque_de_la_memoria
+victimas_apodo &lt;- presentes::apodos
+victimas_denuncia &lt;- presentes::victimas_accionar_represivo_ilegal
+victimas_sin_denuncia &lt;- presentes::victimas_accionar_represivo_ilegal_sin_denuncia_formal
+centros_clandestinos &lt;- presentes::centros_clandestinos_detencion</code></pre>
+<p>Selección de variables del dataframe victimas_parque:</p>
+<pre class="r"><code>victimas_parque &lt;- select(parque_de_la_memoria, id, edad, fecha_de_secuestro, lugar_de_secuestro, ocupaciones, sexo)</code></pre>
+<p>Exploramos las especificaciones del dataframe</p>
+<pre class="r"><code>str(victimas_parque)</code></pre>
+<pre><code>## tibble [8,751 × 6] (S3: tbl_df/tbl/data.frame)
+##  $ id                : chr [1:8751] &quot;2123&quot; &quot;2125&quot; &quot;50&quot; &quot;2126&quot; ...
+##  $ edad              : chr [1:8751] &quot;26&quot; &quot;24&quot; &quot;23&quot; &quot;25&quot; ...
+##  $ fecha_de_secuestro: chr [1:8751] &quot;02/01/1977&quot; &quot;15/08/1976&quot; &quot;01/07/1976&quot; NA ...
+##  $ lugar_de_secuestro: chr [1:8751] &quot;LA PLATA. BS. AS.&quot; &quot;CORDOBA CAPITAL&quot; &quot;CAPITAL FEDERAL&quot; NA ...
+##  $ ocupaciones       : chr [1:8751] &quot;Estudiante Universitario                                                            Rugbier&quot; &quot;Lic. Cs. Políticas                                                            Estudiante Universitaria&quot; NA &quot;Atleta                                                            Estudiante Universitario&quot; ...
+##  $ sexo              : chr [1:8751] &quot;Masculino&quot; &quot;Femenino&quot; &quot;Masculino&quot; &quot;Masculino&quot; ...</code></pre>
+<p>Exploro datos de victimas_parque</p>
+<p>Exploración sexo de las víctimas</p>
+<pre class="r"><code>victimas_parque %&gt;% 
+  group_by(sexo) %&gt;% 
+  summarise(cantidad_sexo = n()) %&gt;% 
+  arrange(desc(cantidad_sexo))</code></pre>
+<pre><code>## # A tibble: 3 × 2
+##   sexo      cantidad_sexo
+##   &lt;chr&gt;             &lt;int&gt;
+## 1 Masculino          6519
+## 2 Femenino           2230
+## 3 NA                    2</code></pre>
+<p>Exploración edad de las victimas</p>
+<pre class="r"><code>victimas_parque %&gt;% 
+  group_by(edad) %&gt;% 
+  summarise(cantidad = n()) %&gt;% 
+  arrange(desc(cantidad))</code></pre>
+<pre><code>## # A tibble: 69 × 2
+##    edad  cantidad
+##    &lt;chr&gt;    &lt;int&gt;
+##  1 22         614
+##  2 24         613
+##  3 23         581
+##  4 21         537
+##  5 25         537
+##  6 26         524
+##  7 27         514
+##  8 28         438
+##  9 20         396
+## 10 29         367
+## # … with 59 more rows
+## # ℹ Use `print(n = ...)` to see more rows</code></pre>
+<p>Quizás podemos mencionarlo como datos raros… Esto no da bien los
+calculos, de hecho toma como edad max el 9, es raro… será porque está
+escrito como caracter y no como numerico?</p>
+<pre class="r"><code>victimas_parque %&gt;%
+  filter(!is.na(edad)) %&gt;% 
+  summarise(edad_max = max(edad, na.rm = TRUE), edad_min = min(edad, na.rm = TRUE), edad_media = mean(edad, na.rm = TRUE), edad_sd = sd(edad, na.rm = TRUE))</code></pre>
+<pre><code>## Warning in mean.default(edad, na.rm = TRUE): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre><code>## Warning in var(if (is.vector(x) || is.factor(x)) x else as.double(x), na.rm =
+## na.rm): NAs introducidos por coerción</code></pre>
+<pre><code>## # A tibble: 1 × 4
+##   edad_max edad_min edad_media edad_sd
+##   &lt;chr&gt;    &lt;chr&gt;         &lt;dbl&gt;   &lt;dbl&gt;
+## 1 9        -                NA    9.06</code></pre>
+<p>Exploración edad y ocupaciones de las victimas</p>
+<pre class="r"><code>victimas_parque %&gt;%
+  filter(!is.na(ocupaciones)) %&gt;% 
+  group_by(edad, ocupaciones) %&gt;% 
+  summarise(cantidad = n()) %&gt;% 
+  arrange(desc(cantidad))</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;edad&#39;. You can override using the
+## `.groups` argument.</code></pre>
+<pre><code>## # A tibble: 4,493 × 3
+## # Groups:   edad [58]
+##    edad  ocupaciones              cantidad
+##    &lt;chr&gt; &lt;chr&gt;                       &lt;int&gt;
+##  1 22    Estudiante Universitario       89
+##  2 23    Estudiante Universitario       69
+##  3 24    Estudiante Universitario       67
+##  4 21    Estudiante Universitario       66
+##  5 22    Estudiante Universitaria       51
+##  6 25    Estudiante Universitario       47
+##  7 20    Estudiante Universitario       46
+##  8 21    Estudiante Universitaria       43
+##  9 26    Estudiante Universitario       43
+## 10 24    Estudiante Universitaria       42
+## # … with 4,483 more rows
+## # ℹ Use `print(n = ...)` to see more rows</code></pre>
+<p>exploro por ocupacion y sexo, filtro por cant de ocupaciones, se
+puede filtrar para que no aparezca el na</p>
+<pre class="r"><code>victimas_parque %&gt;% 
+  group_by(ocupaciones,sexo) %&gt;% 
+  summarise(cant_ocupaciones = n()) %&gt;% 
+  arrange(desc(cant_ocupaciones)) %&gt;% 
+  filter(cant_ocupaciones &gt; 50) </code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;ocupaciones&#39;. You can override using the
+## `.groups` argument.</code></pre>
+<pre><code>## # A tibble: 12 × 3
+## # Groups:   ocupaciones [10]
+##    ocupaciones              sexo      cant_ocupaciones
+##    &lt;chr&gt;                    &lt;chr&gt;                &lt;int&gt;
+##  1 &lt;NA&gt;                     Masculino             1969
+##  2 &lt;NA&gt;                     Femenino               807
+##  3 Estudiante Universitario Masculino              572
+##  4 Estudiante Universitaria Femenino               325
+##  5 Comerciante              Masculino               88
+##  6 Estudiante               Masculino               84
+##  7 Estudiante Secundario    Masculino               74
+##  8 Abogado                  Masculino               61
+##  9 Albañil                  Masculino               58
+## 10 Jornalero                Masculino               55
+## 11 Estudiante               Femenino                54
+## 12 Obrero                   Masculino               51</code></pre>
+<hr />
+<p>convierto dataframe de victimas_accionar_represivo_ilegal en
+victimas2, el segundo chunk se puede borrar</p>
+<pre class="r"><code>victimas_denuncia &lt;- select(victimas_accionar_represivo_ilegal, id_unico_ruvte, edad_al_momento_del_hecho_numerico, fecha_detencion_secuestro, lugar_detencion_secuestro,provincia_nacimiento, tipificacion_ruvte)</code></pre>
+<pre class="r"><code>str(victimas_denuncia)</code></pre>
+<pre><code>## Classes &#39;data.table&#39; and &#39;data.frame&#39;:   8753 obs. of  6 variables:
+##  $ id_unico_ruvte                    : chr  &quot;5389&quot; &quot;87&quot; &quot;11788&quot; &quot;9907&quot; ...
+##  $ edad_al_momento_del_hecho_numerico: num  26 24 21 25 23 54 23 25 27 25 ...
+##  $ fecha_detencion_secuestro         : chr  &quot;26/12/1976&quot; &quot;15/08/1976&quot; &quot;NOV/1976&quot; &quot;08/10/1976&quot; ...
+##  $ lugar_detencion_secuestro         : chr  &quot;LA PLATA  BUENOS AIRES&quot; &quot;CORDOBA  CAPITAL  CORDOBA&quot; &quot;CAPITAL FEDERAL&quot; &quot;LA PLATA  BUENOS AIRES&quot; ...
+##  $ provincia_nacimiento              : chr  &quot;BUENOS AIRES&quot; &quot;MENDOZA&quot; &quot;TUCUMAN&quot; &quot;BUENOS AIRES&quot; ...
+##  $ tipificacion_ruvte                : chr  &quot;DESAPARICION FORZADA&quot; &quot;DESAPARICION FORZADA&quot; &quot;DESAPARICION FORZADA&quot; &quot;ASESINATO&quot; ...
+##  - attr(*, &quot;.internal.selfref&quot;)=&lt;externalptr&gt; 
+##  - attr(*, &quot;index&quot;)= int(0)</code></pre>
+<p>Exploración por edad</p>
+<pre class="r"><code>victimas_denuncia %&gt;% 
+  group_by(edad_al_momento_del_hecho_numerico) %&gt;% 
+  summarise(cantidad = n()) %&gt;% 
+  arrange(desc(cantidad))</code></pre>
+<pre><code>## # A tibble: 78 × 2
+##    edad_al_momento_del_hecho_numerico cantidad
+##                                 &lt;dbl&gt;    &lt;int&gt;
+##  1                                 24      615
+##  2                                 22      606
+##  3                                 23      594
+##  4                                 21      554
+##  5                                 25      548
+##  6                                 26      531
+##  7                                 27      511
+##  8                                 28      443
+##  9                                 20      390
+## 10                                 29      363
+## # … with 68 more rows
+## # ℹ Use `print(n = ...)` to see more rows</code></pre>
+<p>Exploración; promedio, valos máximo, valor mínimo y desvío
+estándar</p>
+<pre class="r"><code>victimas_denuncia %&gt;% 
+  summarise(edad_max = max(edad_al_momento_del_hecho_numerico, na.rm = TRUE), edad_min = min(edad_al_momento_del_hecho_numerico, na.rm = TRUE), edad_media = mean(edad_al_momento_del_hecho_numerico, na.rm = TRUE), edad_sd = sd(edad_al_momento_del_hecho_numerico, na.rm = TRUE))</code></pre>
+<pre><code>##   edad_max edad_min edad_media  edad_sd
+## 1       81        0   28.08264 9.549192</code></pre>
+<p>Exploración cantidad de nacidos en cautiverio(son el 0)</p>
+<pre class="r"><code>victimas_denuncia %&gt;% 
+  filter(edad_al_momento_del_hecho_numerico == 0) %&gt;% 
+  summarise(cantidad_nacidos_cautiverio = n())</code></pre>
+<pre><code>##   cantidad_nacidos_cautiverio
+## 1                          47</code></pre>
+<p>Exploro lugar de secuestro, dejando de lado los datos
+faltantes(na)</p>
+<pre class="r"><code>victimas_denuncia %&gt;% 
+  filter(!is.na(lugar_detencion_secuestro)) %&gt;% 
+  group_by(lugar_detencion_secuestro) %&gt;% 
+  summarise(cantidad_lugar = n()) %&gt;% 
+  arrange(desc(cantidad_lugar)) </code></pre>
+<pre><code>## # A tibble: 514 × 2
+##    lugar_detencion_secuestro                     cantidad_lugar
+##    &lt;chr&gt;                                                  &lt;int&gt;
+##  1 CAPITAL FEDERAL                                         1944
+##  2 CORDOBA  CAPITAL  CORDOBA                                534
+##  3 LA PLATA  BUENOS AIRES                                   421
+##  4 SAN MIGUEL DE TUCUMAN  CAPITAL  TUCUMAN                  288
+##  5 ROSARIO  SANTA FE                                        242
+##  6 MAR DEL PLATA  GRAL. PUEYRREDON  BUENOS AIRES            222
+##  7 BAHIA BLANCA  BUENOS AIRES                                69
+##  8 CAMPANA  BUENOS AIRES                                     58
+##  9 MENDOZA  CAPITAL  MENDOZA                                 55
+## 10 SALTA  CAPITAL  SALTA                                     54
+## # … with 504 more rows
+## # ℹ Use `print(n = ...)` to see more rows</code></pre>
+<p>Exploro los lugares de secuestro de más de 100 victimas, dejando de
+lado los na</p>
+<pre class="r"><code>victimas_denuncia %&gt;% 
+  filter(!is.na(lugar_detencion_secuestro)) %&gt;% 
+  group_by(lugar_detencion_secuestro) %&gt;% 
+  summarise(cantidad_lugar = n()) %&gt;% 
+  filter(cantidad_lugar &gt; 100) %&gt;% 
+  arrange(desc(cantidad_lugar)) </code></pre>
+<pre><code>## # A tibble: 6 × 2
+##   lugar_detencion_secuestro                     cantidad_lugar
+##   &lt;chr&gt;                                                  &lt;int&gt;
+## 1 CAPITAL FEDERAL                                         1944
+## 2 CORDOBA  CAPITAL  CORDOBA                                534
+## 3 LA PLATA  BUENOS AIRES                                   421
+## 4 SAN MIGUEL DE TUCUMAN  CAPITAL  TUCUMAN                  288
+## 5 ROSARIO  SANTA FE                                        242
+## 6 MAR DEL PLATA  GRAL. PUEYRREDON  BUENOS AIRES            222</code></pre>
+<p>Cuento la cantidad de victimas cuyo lugar de detención no está
+determinado</p>
+<pre class="r"><code>victimas_denuncia %&gt;% 
+  summarise(cantidad_nas_lugar_secuestro = sum(is.na(lugar_detencion_secuestro)))</code></pre>
+<pre><code>##   cantidad_nas_lugar_secuestro
+## 1                         1182</code></pre>
+<p>exploro la fecha de secuestro, PREGUNTAR A ELIO COMO TOMO UN AÑO SI
+LA FECHA ESTA EN DD/MM/AAA</p>
+<pre class="r"><code>victimas_denuncia %&gt;% 
+  group_by(fecha_detencion_secuestro, lugar_detencion_secuestro) %&gt;% 
+  summarise(cantidad_fecha = n()) %&gt;% 
+  arrange(desc(cantidad_fecha))</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;fecha_detencion_secuestro&#39;. You can
+## override using the `.groups` argument.</code></pre>
+<pre><code>## # A tibble: 4,838 × 3
+## # Groups:   fecha_detencion_secuestro [1,686]
+##    fecha_detencion_secuestro lugar_detencion_secuestro        cantidad_fecha
+##    &lt;chr&gt;                     &lt;chr&gt;                                     &lt;int&gt;
+##  1 &lt;NA&gt;                      &lt;NA&gt;                                       1133
+##  2 06/12/1977                CAPITAL FEDERAL                              31
+##  3 13/12/1976                RESISTENCIA  SAN FERNANDO  CHACO             13
+##  4 16/02/1977                CAPITAL FEDERAL                              13
+##  5 16/05/1977                CAPITAL FEDERAL                              13
+##  6 27/07/1976                CAPITAL FEDERAL                              13
+##  7 14/09/1976                CAPITAL FEDERAL                              12
+##  8 06/07/1976                SALTA  CAPITAL  SALTA                        11
+##  9 08/01/1976                CORDOBA  CAPITAL  CORDOBA                    10
+## 10 08/12/1977                CAPITAL FEDERAL                              10
+## # … with 4,828 more rows
+## # ℹ Use `print(n = ...)` to see more rows</code></pre>
+<p>Exploración Centros clandestinos</p>
+<pre class="r"><code>str(centros_clandestinos)</code></pre>
+<pre><code>## spec_tbl_df [762 × 7] (S3: spec_tbl_df/tbl_df/tbl/data.frame)
+##  $ ID                           : num [1:762] 1 2 3 4 5 6 7 8 9 10 ...
+##  $ lugar_emplazamiento_propiedad: chr [1:762] &quot;POLICÍA FEDERAL&quot; &quot;EJÉRCITO&quot; &quot;ARMADA&quot; &quot;SERVICIO PENITENCIARIO PROVINCIAL&quot; ...
+##  $ denominacion                 : chr [1:762] &quot;OLIMPO&quot; &quot;LA PERLA&quot; &quot;ESCUELA DE MECÁNICA DE LA ARMADA (ESMA)                                                         UNIDAD DE COMANDO ÁREA IIIA&quot; &quot;UNIDAD PENAL DE VILLA LAS ROSAS&quot; ...
+##  $ espacio_de_memoria           : logi [1:762] TRUE TRUE TRUE FALSE FALSE FALSE ...
+##  $ ubicacion                    : chr [1:762] &quot;RAMÓN FALCÓN 4151 · Vélez Sarsfield · CAPITAL FEDERAL                                                          &quot;| __truncated__ &quot;Ruta Nac. Nº 20 Km 12 · MALAGUEÑO · SANTA MARÍA · CÓRDOBA                          EX DEPCIAS. DEL ARMA BRIGADA&quot;| __truncated__ &quot;Av. DEL LIBERTADOR 8151 · Núñez · CAPITAL FEDERAL&quot; &quot;Av. HIPÓLITO YRIGOYEN 841 · Villa las Rosas · SALTA · CAPITAL · SALTA&quot; ...
+##  $ lon                          : num [1:762] -58.4 -64.4 -58.5 -65.4 -58.3 ...
+##  $ lat                          : num [1:762] -34.6 -31.5 -34.5 -24.8 -34.8 ...
+##  - attr(*, &quot;spec&quot;)=List of 3
+##   ..$ cols   :List of 7
+##   .. ..$ ID                           : list()
+##   .. .. ..- attr(*, &quot;class&quot;)= chr [1:2] &quot;collector_double&quot; &quot;collector&quot;
+##   .. ..$ lugar_emplazamiento_propiedad: list()
+##   .. .. ..- attr(*, &quot;class&quot;)= chr [1:2] &quot;collector_character&quot; &quot;collector&quot;
+##   .. ..$ denominacion                 : list()
+##   .. .. ..- attr(*, &quot;class&quot;)= chr [1:2] &quot;collector_character&quot; &quot;collector&quot;
+##   .. ..$ espacio_de_memoria           : list()
+##   .. .. ..- attr(*, &quot;class&quot;)= chr [1:2] &quot;collector_logical&quot; &quot;collector&quot;
+##   .. ..$ ubicacion                    : list()
+##   .. .. ..- attr(*, &quot;class&quot;)= chr [1:2] &quot;collector_character&quot; &quot;collector&quot;
+##   .. ..$ lon                          : list()
+##   .. .. ..- attr(*, &quot;class&quot;)= chr [1:2] &quot;collector_double&quot; &quot;collector&quot;
+##   .. ..$ lat                          : list()
+##   .. .. ..- attr(*, &quot;class&quot;)= chr [1:2] &quot;collector_double&quot; &quot;collector&quot;
+##   ..$ default: list()
+##   .. ..- attr(*, &quot;class&quot;)= chr [1:2] &quot;collector_guess&quot; &quot;collector&quot;
+##   ..$ skip   : num 1
+##   ..- attr(*, &quot;class&quot;)= chr &quot;col_spec&quot;</code></pre>
+<pre class="r"><code>centros_clandestinos %&gt;%
+  group_by(lugar_emplazamiento_propiedad) %&gt;% 
+  summarise(distrib_propiedad_fuerza = n()) %&gt;% 
+  arrange(desc(distrib_propiedad_fuerza))</code></pre>
+<pre><code>## # A tibble: 30 × 2
+##    lugar_emplazamiento_propiedad     distrib_propiedad_fuerza
+##    &lt;chr&gt;                                                &lt;int&gt;
+##  1 POLICÍA PROVINCIAL                                     374
+##  2 EJÉRCITO                                                83
+##  3 POLICÍA FEDERAL                                         64
+##  4 SERVICIO PENITENCIARIO PROVINCIAL                       39
+##  5 ESTABLECIMIENTO PRIVADO                                 22
+##  6 GENDARMERÍA NACIONAL                                    21
+##  7 ESTABLECIMIENTO EDUCATIVO                               17
+##  8 HOSPITAL PÚBLICO                                        17
+##  9 ESTATAL                                                 15
+## 10 ARMADA                                                  14
+## # … with 20 more rows
+## # ℹ Use `print(n = ...)` to see more rows</code></pre>
+<p>Exploro por ubicación del centro clandestino</p>
 </div>
 <div id="hipótesis" class="section level2">
 <h2>Hipótesis</h2>
+<p>Finalmente, esta sección contiene <strong>al menos 3</strong>
+hipótesis o preguntas que puedan ser respondidas a partir de los datos.
+Éstas tienen que ser más o menos interesantes y no cosas que se hayan
+respondido con la exploración anterior.</p>
+<p>Traten de que sean hipótesis o preguntas que relacionen 2 o más
+variables. Por ejemplo, “¿Cuál es el mes con más turistas en una
+región?” no es una pregunta intersante, pero “Existe una relación entre
+la cantidad de visitas y la cantidad de hoteles en una región” es una
+hipótesis más jugosa que apunta a la relación entre varias variables y a
+un fenómeno subyacente que puede tener implicancia y aplicaciones.</p>
+<p><strong>No tienen que responder</strong> estas preguntas en esta
+entrega.</p>
 </div>
 
 

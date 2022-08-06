@@ -9,141 +9,167 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 library(presentes)
 library(dplyr)
-library(ggplot2)
 ```
 
 ## Introducción
-Esta sección consiste en entre 2 y 3 párrafos describiendo los datos.
-Qué decir sobre los datos dependerá de los datos elegidos pero algunos detalles posibles son:
 
--   ¿Qué datos son?
--   ¿De dónde provienen? ¿Quién los tomó?
--   ¿En qué período se tomaron?
+El presente informe consiste en el análisis de los datos del paquete "presentes", el cual reúne la información oficial sobre víctimas de la dictadura militar entre el 24 de marzo de 1976 y el 10 de diciembre de 1983 en Argentina. 
+Las fuentes principales de los datos del paquete provienen del Registro Único de Víctimas del Terrorismo de Estado (RUVTE) y del Monumento a las Víctimas del Terrorismo de Estado. 
 
+En el informe haremos hincapié en observar las relaciones  (lo completamos cuando tengamos los graficos)
 
-El presente informe consiste en el análisis de los datos del paquete "presentes", que incluye la información oficial sobre víctimas de la dictadura militar entre el 24 de marzo de 1976 y el 10 de diciembre de 1983 en Argentina. 
-sumar si tomamos victimas de años anteriores
-Precisamente se ha hecho hincapié en observar las relaciones  (lo completamos cuando tengamos los graficos)
 No queremos dejar de mencionar que, más allá de que los datos recabados indican un número de 8753 victimas, existe un gran número de victimas desaparecidas y asesinadas que aún no han podido ser identificadxs.
 
-fuentes
 
 ## Exploración de los datos
 
-Esta sección es una primera exploracion de los datos.
-¿Qué variables tiene? 
-¿Cuántas observaciones hay?
-¿Cuántas variables?
-
-
 ```{r}
-parque_de_la_memoria <- presentes::parque_de_la_memoria
+victimas_parque <- presentes::parque_de_la_memoria
+victimas_apodo <- presentes::apodos
+victimas_denuncia <- presentes::victimas_accionar_represivo_ilegal
+victimas_sin_denuncia <- presentes::victimas_accionar_represivo_ilegal_sin_denuncia_formal
+centros_clandestinos <- presentes::centros_clandestinos_detencion
+
 ```
 
+
+Selección de variables del dataframe victimas_parque:
 ```{r}
-victimas_accionar_represivo_ilegal <- presentes::victimas_accionar_represivo_ilegal
+victimas_parque <- select(parque_de_la_memoria, id, edad, fecha_de_secuestro, lugar_de_secuestro, ocupaciones, sexo)
+```
+Exploramos las especificaciones del dataframe
+```{r}
+str(victimas_parque)
 ```
 
-convierto dataframe de parque de la memoria en victimas, el primer chunk se puede borrar
+
+Exploro datos de victimas_parque
+
+Exploración sexo de las víctimas
 ```{r}
-victimas <- select(parque_de_la_memoria, id, edad, fecha_de_secuestro, lugar_de_secuestro, ocupaciones)
-victimas
+victimas_parque %>% 
+  group_by(sexo) %>% 
+  summarise(cantidad_sexo = n()) %>% 
+  arrange(desc(cantidad_sexo))
+```
+Exploración edad de las victimas
+```{r}
+victimas_parque %>% 
+  group_by(edad) %>% 
+  summarise(cantidad = n()) %>% 
+  arrange(desc(cantidad))
 ```
 
+Quizás podemos mencionarlo como datos raros...
+Esto no da bien los calculos, de hecho toma como edad max el 9, es raro... será porque está escrito como caracter y no como numerico?
 ```{r}
-str(victimas)
+victimas_parque %>%
+  filter(!is.na(edad)) %>% 
+  summarise(edad_max = max(edad, na.rm = TRUE), edad_min = min(edad, na.rm = TRUE), edad_media = mean(edad, na.rm = TRUE), edad_sd = sd(edad, na.rm = TRUE))
 ```
+
+
+Exploración edad y ocupaciones de las victimas
+```{r}
+victimas_parque %>%
+  filter(!is.na(ocupaciones)) %>% 
+  group_by(edad, ocupaciones) %>% 
+  summarise(cantidad = n()) %>% 
+  arrange(desc(cantidad))
+```
+
+
+Exploración por ocupación y sexo, filtrando por cantidad de víctimas con x ocupacion mayor a 50, se puede filtrar para que no aparezca el na
+```{r}
+victimas_parque %>% 
+  group_by(ocupaciones,sexo) %>% 
+  summarise(cant_ocupaciones = n()) %>% 
+  arrange(desc(cant_ocupaciones)) %>% 
+  filter(cant_ocupaciones > 50) 
+```
+
 
 ----
 
-convierto dataframe de victimas_accionar_represivo_ilegal en victimas2, el segundo chunk se puede borrar
+Exploración de datos de dataframe victimas_accionar_represeivo_ilegal
 ```{r}
-victimas2 <- select(victimas_accionar_represivo_ilegal, id_unico_ruvte, edad_al_momento_del_hecho_numerico, fecha_detencion_secuestro, lugar_detencion_secuestro,provincia_nacimiento, tipificacion_ruvte)
+victimas_denuncia <- select(victimas_accionar_represivo_ilegal, id_unico_ruvte, edad_al_momento_del_hecho_numerico, fecha_detencion_secuestro, lugar_detencion_secuestro,provincia_nacimiento, tipificacion_ruvte)
 ```
 
 ```{r}
-str(victimas2)
+str(victimas_denuncia)
 ```
-empiezo a explorar victimas2(empecé por este porque tiene la edad como dato numerico, en el caso de victimas el numero está como caracter)
-
-cantidad de victimas por edad
+Exploración por edad
 ```{r}
-victimas2 %>% 
+victimas_denuncia %>% 
   group_by(edad_al_momento_del_hecho_numerico) %>% 
   summarise(cantidad = n()) %>% 
-  arrange(desc(cantidad)) %>% 
-  ggplot(aes(edad_al_momento_del_hecho_numerico, cantidad))+
-  geom_col(aes(color = edad_al_momento_del_hecho_numerico))
+  arrange(desc(cantidad))
 ```
-edad maxima
+Exploración; promedio, valor máximo, valor mínimo y desvío estándar
 ```{r}
-victimas2 %>% 
-  summarise(edad_max = max(edad_al_momento_del_hecho_numerico, na.rm = TRUE))
-```
-
-
-argupado max, min, media,ds
-```{r}
-victimas2 %>% 
+victimas_denuncia %>% 
   summarise(edad_max = max(edad_al_momento_del_hecho_numerico, na.rm = TRUE), edad_min = min(edad_al_momento_del_hecho_numerico, na.rm = TRUE), edad_media = mean(edad_al_momento_del_hecho_numerico, na.rm = TRUE), edad_sd = sd(edad_al_momento_del_hecho_numerico, na.rm = TRUE))
 ```
-
-lugar de secuestro, dejando de lado los datos faltantes(na)
+Exploración cantidad de nacidos en cautiverio (son el 0)
 ```{r}
-victimas2 %>% 
+victimas_denuncia %>% 
+  filter(edad_al_momento_del_hecho_numerico == 0) %>% 
+  summarise(cantidad_nacidos_cautiverio = n())
+```
+
+
+Exploro lugar de secuestro, dejando de lado los datos faltantes(na)
+```{r}
+victimas_denuncia %>% 
   filter(!is.na(lugar_detencion_secuestro)) %>% 
   group_by(lugar_detencion_secuestro) %>% 
   summarise(cantidad_lugar = n()) %>% 
   arrange(desc(cantidad_lugar)) 
 ```
-grafico victimas > 200 por lugar de secuestro, dejando de lado los na
+Exploro los lugares de secuestro de más de 100 victimas, dejando de lado los na
 ```{r}
-victimas2 %>% 
+victimas_denuncia %>% 
   filter(!is.na(lugar_detencion_secuestro)) %>% 
   group_by(lugar_detencion_secuestro) %>% 
   summarise(cantidad_lugar = n()) %>% 
-  filter(cantidad_lugar > 200) %>% 
-  arrange(desc(cantidad_lugar)) %>% 
-  ggplot(aes(lugar_detencion_secuestro, cantidad_lugar))+
-  geom_col(aes(color = lugar_detencion_secuestro))
+  filter(cantidad_lugar > 100) %>% 
+  arrange(desc(cantidad_lugar)) 
 ```
 
-
-contando la cantidad de datos faltantes
+Cuento la cantidad de victimas cuyo lugar de detención no está determinado
 ```{r}
-victimas2 %>% 
+victimas_denuncia %>% 
   summarise(cantidad_nas_lugar_secuestro = sum(is.na(lugar_detencion_secuestro)))
 ```
-
-
-
-Seleccioná algunas variables resulten interesantes y mostrá sus propiedades.
-Algunas cosas para mostrar:
-
--   ¿Cuál es su valor medio y desvío estándard?
--   ¿Cuál es su rango (valor máximo y valor mínimo)?
--   ¿Hay alguna anomalía que sugiera que hay datos incorrectos? Valores imposibles (como valores negativos en una variable que sólo puede ser positiva) o poco creíbles.
--   ¿Cuántas observaciones hay por cada grupo? ¿Cuántos valores faltantes? ¿Hay diferencias?
-
-Esta sección sí tiene que tener código de R.
-
-Los resultados del código tienen que estar acompañados de un texto que los describa y que elabore sobre los mismos.
-Es decir, no sólo repetir lo que se ve, sino también comentar sobre su significado en el contexto de estos datos.
-No hace falta que sean párrafos largos; cada uno no debería tener más de 5-6 frases.
-
+exploro la fecha de secuestro, PREGUNTAR A ELIO COMO TOMO UN AÑO SI LA FECHA ESTA EN DD/MM/AAA
 ```{r}
-victimas %>% 
-  group_by(lugar_de_secuestro) %>% 
-  summarise(cantidad = n()) %>% 
-  arrange(desc(cantidad))
+victimas_denuncia %>% 
+  group_by(fecha_detencion_secuestro, lugar_detencion_secuestro) %>% 
+  summarise(cantidad_fecha = n()) %>% 
+  arrange(desc(cantidad_fecha))
+  
 ```
 
+Exploración Centros clandestinos
 ```{r}
-victimas %>% 
-  group_by(edad) %>% 
-  summarise(cantidad = n()) %>% 
-  arrange(desc(cantidad))
+str(centros_clandestinos)
 ```
+```{r}
+centros_clandestinos %>%
+  group_by(lugar_emplazamiento_propiedad) %>% 
+  summarise(distrib_propiedad_fuerza = n()) %>% 
+  arrange(desc(distrib_propiedad_fuerza))
+```
+Exploro por ubicación del centro clandestino
+```{r}
+
+```
+
+
+
+
+
 
 
 ## Hipótesis
