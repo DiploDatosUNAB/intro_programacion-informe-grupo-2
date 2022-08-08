@@ -13,12 +13,10 @@ library(dplyr)
 
 ## Introducción
 
-El presente informe consiste en el análisis de los datos del paquete "presentes", el cual reúne la información oficial sobre víctimas de la dictadura militar entre el 24 de marzo de 1976 y el 10 de diciembre de 1983 en Argentina. 
-Las fuentes principales de los datos del paquete provienen del Registro Único de Víctimas del Terrorismo de Estado (RUVTE),dependiente de la Secretaría de Derechos Humanos y Pluralismo Cultural del Ministerio de Justicia y Derechos Humanos de la Nación y del,  Monumento a las Víctimas del Terrorismo de Estado, realizado por el Consejo de Gestión del Parque de la Memoria y del Monumento a las Víctimas del Terrorismo de Estado, creado por la ley 3078 de la Ciudad de Buenos Aires.
+El presente informe consiste en el análisis de los datos del paquete "presentes", el cual reúne la información oficial sobre víctimas de la dictadura militar entre el 24 de marzo de 1976 y el 10 de diciembre de 1983 en Argentina, como también de años previos al inicio formal del gope de estado militar. 
+Las fuentes principales de los datos del paquete provienen del Registro Único de Víctimas del Terrorismo de Estado (RUVTE),dependiente de la Secretaría de Derechos Humanos y Pluralismo Cultural del Ministerio de Justicia y Derechos Humanos de la Nación y del Monumento a las Víctimas del Terrorismo de Estado, realizado por el Consejo de Gestión del Parque de la Memoria y del Monumento a las Víctimas del Terrorismo de Estado, creado por la ley 3078 de la Ciudad de Buenos Aires.
 
-Ambos registros recogen información de víctimas asesinadas o detenidas/desaparecidas aún antes de la fecha del inicio formal del golpe de estado militar.
-
-En el informe haremos hincapié en observar las variables de edad de las víctimas, cuáles fueron las ciudad donde sucedió el secuestro, las ocupaciones de las victimas y los centros clandestinos de detención de las víctimas.
+En el informe hacemos hincapié en observar las variables de la edad de las víctimas, cuáles fueron las ciudades donde sucedió el secuestro, las ocupaciones de las victimas y los años de secuestro.
 
 No queremos dejar de mencionar que, más allá de que los datos recabados indican un número de 8753 victimas, existe un gran número de victimas desaparecidas que aún no han podido ser identificadxs.
 
@@ -36,7 +34,7 @@ centros_clandestinos <- presentes::centros_clandestinos_detencion
 
 Selección de variables del dataframe victimas_parque:
 ```{r}
-victimas_parque <- select(parque_de_la_memoria, id, edad, fecha_de_secuestro, lugar_de_secuestro, ocupaciones, sexo)
+victimas_parque <- select(parque_de_la_memoria, id, edad, fecha_de_secuestro, ano_en_monumento, lugar_de_secuestro, ocupaciones, sexo)
 ```
 Exploramos las especificaciones del dataframe
 ```{r}
@@ -52,10 +50,11 @@ victimas_parque %>%
   summarise(cantidad_sexo = n()) %>% 
   arrange(desc(cantidad_sexo))
 ```
+
 Exploración edad de las victimas
 ```{r}
 victimas_parque %>% 
-  group_by(edad) %>% 
+  group_by(as.numeric(edad), sexo) %>% 
   summarise(cantidad = n()) %>% 
   arrange(desc(cantidad))
 ```
@@ -86,6 +85,52 @@ victimas_parque %>%
   summarise(cant_ocupaciones = n()) %>% 
   arrange(desc(cant_ocupaciones)) %>% 
   filter(cant_ocupaciones > 50) 
+```
+Exploro por año
+
+```{r}
+victimas_parque %>% 
+  group_by(ano_en_monumento) %>% 
+  mutate(anio = as.numeric(ano_en_monumento)) %>% 
+  group_by(anio) %>% 
+  summarise(victimas_por_anio = n()) %>% 
+  arrange(desc(victimas_por_anio))
+```
+
+Victimas por edad y año de secuestro
+
+```{r}
+victimas_parque %>% 
+  group_by(ano_en_monumento) %>% 
+  mutate(anio = as.numeric(ano_en_monumento)) %>% 
+  group_by(edad, anio) %>% 
+  summarise(victimas_por_anio = n()) %>% 
+  arrange(desc(victimas_por_anio))
+```
+Exploración victimas por edad, año de secuestro y ocupacion
+```{r}
+victimas_parque %>% 
+  group_by(ano_en_monumento) %>% 
+  mutate(anio = as.numeric(ano_en_monumento)) %>% 
+  group_by(edad, anio, ocupaciones) %>% 
+  filter(!is.na(ocupaciones)) %>% 
+  summarise(victimas_por_anio = n()) %>% 
+  arrange(desc(victimas_por_anio))
+```
+
+```{r}
+victimas_parque %>% 
+  filter(militancia != "list(listado = character(0))") %>% 
+  group_by(as.character(militancia), ano_en_monumento) %>% 
+  summarise(cant_por_militancia = n()) %>% 
+  arrange(desc(cant_por_militancia))
+```
+```{r}
+victimas_parque %>% 
+  filter(militancia != "list(listado = character(0))") %>% 
+  group_by(as.character(militancia)) %>% 
+  summarise(cant_por_militancia = n()) %>% 
+  arrange(desc(cant_por_militancia))
 ```
 
 
@@ -158,8 +203,8 @@ str(centros_clandestinos)
 ```{r}
 centros_clandestinos %>%
   group_by(lugar_emplazamiento_propiedad) %>% 
-  summarise(distrib_propiedad_fuerza = n()) %>% 
-  arrange(desc(distrib_propiedad_fuerza))
+  summarise(distrib_propiedad = n()) %>% 
+  arrange(desc(distrib_propiedad))
 ```
 Exploro por ubicación del centro clandestino. LE TENGO QUE PREGUNTAR A ELIO COMO FILTRAR POR PALABRA CLAVE, PARA QUE TOME LA PROVINCIA O CIUDAD
 ```{r}
@@ -167,6 +212,17 @@ centros_clandestinos %>%
     group_by(ubicacion)
 ```
 
+Exploro por tipificacion
+```{r}
+victimas_denuncia %>% 
+  group_by(tipificacion_ruvte) %>% 
+  summarise(tipos = n()) %>% 
+  arrange(desc(tipos))
+```
+```{r}
+victimas_denuncia %>% 
+  filter(tipificacion_ruvte)
+```
 
 
 
