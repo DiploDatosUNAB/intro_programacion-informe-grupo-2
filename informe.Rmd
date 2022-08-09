@@ -81,9 +81,11 @@ victimas_parque %>%
   filter(!is.na(ocupaciones)) %>% 
   group_by(edad, ocupaciones) %>% 
   summarise(cantidad = n()) %>% 
-  arrange(desc(cantidad))
+  arrange(desc(cantidad))%>% 
+  rename("Edad" = edad, "Ocupaciones" = ocupaciones, "Víctimas" = cantidad )
 ```
 
+ACÁ SI QUEREMOS PODEMOS SACAR LOS DATOS FALTANTES(NA)
 
 Exploración por ocupación y sexo, filtrando por cantidad de víctimas con x ocupacion mayor a 50, se puede filtrar para que no aparezca el na
 ```{r}
@@ -91,7 +93,8 @@ victimas_parque %>%
   group_by(ocupaciones,sexo) %>% 
   summarise(cant_ocupaciones = n()) %>% 
   arrange(desc(cant_ocupaciones)) %>% 
-  filter(cant_ocupaciones > 50) 
+  filter(cant_ocupaciones > 50) %>% 
+  rename("Ocupaciones" = ocupaciones, "Sexo" = sexo, "Víctimas" = cant_ocupaciones)
 ```
 Exploro por año
 
@@ -101,7 +104,8 @@ victimas_parque %>%
   mutate(anio = as.numeric(ano_en_monumento)) %>% 
   group_by(anio) %>% 
   summarise(victimas_por_anio = n()) %>% 
-  arrange(desc(victimas_por_anio))
+  arrange(desc(victimas_por_anio)) %>% 
+  rename("Año de secuestro/asesinato" = anio, "Víctimas" = victimas_por_anio)
 ```
 
 Victimas por edad y año de secuestro
@@ -112,7 +116,8 @@ victimas_parque %>%
   mutate(anio = as.numeric(ano_en_monumento)) %>% 
   group_by(edad, anio) %>% 
   summarise(victimas_por_anio = n()) %>% 
-  arrange(desc(victimas_por_anio))
+  arrange(desc(victimas_por_anio)) %>% 
+  rename("Edad" = edad, "Año de secuestro/asesinato" = anio, "Víctimas" = victimas_por_anio )
 ```
 Exploración victimas por edad, año de secuestro y ocupacion
 ```{r}
@@ -122,31 +127,34 @@ victimas_parque %>%
   group_by(edad, anio, ocupaciones) %>% 
   filter(!is.na(ocupaciones)) %>% 
   summarise(victimas_por_anio = n()) %>% 
-  arrange(desc(victimas_por_anio))
+  arrange(desc(victimas_por_anio)) %>% 
+  rename("Edad" = edad, "Año de secuestro/asesinato" = anio, "Ocupaciones" = ocupaciones, "Víctimas" = victimas_por_anio)
 ```
-```{r}
-victimas_parque %>%
-  filter(edad %in% c(19, 20, 21, 22, 23, 24, 25, 26, 27)) %>% 
-  group_by(edad) %>% 
-  summarise(cant_vict_edad = n())
-  
-```
+
 ```{r}
 victimas_parque %>%
   filter(edad %in% c(19, 20, 21, 22, 23, 24, 25, 26, 27)) %>% 
   group_by(edad) %>% 
   summarise(cant_vict_edad = n()) %>% 
-  arrange(desc(cant_vict_edad))
+  rename("Edad" = edad, "Víctimas" = cant_vict_edad)
+  
 ```
-
-
+ESTO ES LO MISMO DE ARRIBA ORDENADO POR CANTIDAD DE MAYO A MENOR
+```{r}
+victimas_parque %>%
+  filter(edad %in% c(19, 20, 21, 22, 23, 24, 25, 26, 27)) %>% 
+  group_by(edad) %>% 
+  summarise(cant_vict_edad = n()) %>% 
+  arrange(desc(cant_vict_edad)) %>% 
+  rename("Edad" = edad, "Víctimas" = cant_vict_edad)
+```
 
 ```{r}
 victimas_parque %>% 
   filter(militancia != "list(listado = character(0))") %>% 
   group_by(as.character(militancia), ano_en_monumento) %>% 
   summarise(cant_por_militancia = n()) %>% 
-  arrange(desc(cant_por_militancia))
+  arrange(desc(cant_por_militancia)) 
 ```
 ```{r}
 victimas_parque %>% 
