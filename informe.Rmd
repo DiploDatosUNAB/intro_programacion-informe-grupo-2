@@ -37,14 +37,12 @@ Selección de variables del dataframe victimas_parque:
 ```{r}
 victimas_parque <- select(parque_de_la_memoria, id, edad, fecha_de_secuestro, ano_en_monumento, lugar_de_secuestro, ocupaciones, sexo, militancia)
 ```
-Exploramos las especificaciones del dataframe
 
+Exploramos las especificaciones del dataframe
 ```{r}
 victimas_parque %>% 
   glimpse()
 ```
-
-
 
 Exploración datos de victimas_parque
 
@@ -53,22 +51,26 @@ Exploración sexo de las víctimas
 victimas_parque %>% 
   group_by(sexo) %>% 
   summarise(cantidad_sexo = n()) %>% 
-  arrange(desc(cantidad_sexo))
+  arrange(desc(cantidad_sexo)) %>% 
+  rename("Víctimas" = cantidad_sexo, "Sexo" = sexo)
 ```
 
 Exploración edad de las victimas
 ```{r}
 victimas_parque %>% 
-  group_by(as.numeric(edad), sexo) %>% 
+  group_by(edad, sexo) %>% 
   summarise(cantidad = n()) %>% 
-  arrange(desc(cantidad))
+  arrange(desc(cantidad)) %>% 
+  rename("Edad" = edad, "Sexo" = sexo, "Víctimas" = cantidad)
 ```
+
+ESTO LO SACARÍA DIRECTAMENTE
 
 Quizás podemos mencionarlo como datos raros...
 Esto no da bien los calculos, de hecho toma como edad max el 9, es raro... será porque está escrito como caracter y no como numerico?
 ```{r}
 victimas_parque %>%
-  filter(!is.na(edad)) %>% 
+  filter(as.numeric(edad)) %>% 
   summarise(edad_max = max(edad, na.rm = TRUE), edad_min = min(edad, na.rm = TRUE), edad_media = mean(edad, na.rm = TRUE), edad_sd = sd(edad, na.rm = TRUE))
 ```
 
