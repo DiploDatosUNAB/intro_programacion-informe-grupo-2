@@ -14,9 +14,10 @@ library(dplyr)
 ## Introducción
 
 El presente informe consiste en el análisis de los datos del paquete "presentes", el cual reúne la información oficial sobre víctimas de la dictadura militar entre el 24 de marzo de 1976 y el 10 de diciembre de 1983 en Argentina, como también de años previos al inicio formal del gope de estado militar. 
+
 Las fuentes principales de los datos del paquete provienen del Registro Único de Víctimas del Terrorismo de Estado (RUVTE),dependiente de la Secretaría de Derechos Humanos y Pluralismo Cultural del Ministerio de Justicia y Derechos Humanos de la Nación y del Monumento a las Víctimas del Terrorismo de Estado, realizado por el Consejo de Gestión del Parque de la Memoria y del Monumento a las Víctimas del Terrorismo de Estado, creado por la ley 3078 de la Ciudad de Buenos Aires.
 
-En el informe hacemos hincapié en observar las variables de la edad de las víctimas, cuáles fueron las ciudades donde sucedió el secuestro, las ocupaciones de las victimas y los años de secuestro.
+En el informe haremos hincapié en observar las variables que contienen la edad de las víctimas, cuáles fueron las ciudades y en qué años sucedieron los secuestros y asesinatos, las ocupaciones y espacios de militancia.
 
 No queremos dejar de mencionar que, más allá de que los datos recabados indican un número de 8753 victimas, existe un gran número de victimas desaparecidas que aún no han podido ser identificadxs.
 
@@ -37,9 +38,7 @@ Selección de variables del dataframe victimas_parque:
 victimas_parque <- select(parque_de_la_memoria, id, edad, fecha_de_secuestro, ano_en_monumento, lugar_de_secuestro, ocupaciones, sexo, militancia)
 ```
 Exploramos las especificaciones del dataframe
-```{r}
-str(victimas_parque)
-```
+
 ```{r}
 victimas_parque %>% 
   glimpse()
