@@ -34,12 +34,18 @@ centros_clandestinos <- presentes::centros_clandestinos_detencion
 
 Selección de variables del dataframe victimas_parque:
 ```{r}
-victimas_parque <- select(parque_de_la_memoria, id, edad, fecha_de_secuestro, ano_en_monumento, lugar_de_secuestro, ocupaciones, sexo)
+victimas_parque <- select(parque_de_la_memoria, id, edad, fecha_de_secuestro, ano_en_monumento, lugar_de_secuestro, ocupaciones, sexo, militancia)
 ```
 Exploramos las especificaciones del dataframe
 ```{r}
 str(victimas_parque)
 ```
+```{r}
+victimas_parque %>% 
+  glimpse()
+```
+
+
 
 Exploración datos de victimas_parque
 
@@ -117,6 +123,22 @@ victimas_parque %>%
   summarise(victimas_por_anio = n()) %>% 
   arrange(desc(victimas_por_anio))
 ```
+```{r}
+victimas_parque %>%
+  filter(edad %in% c(19, 20, 21, 22, 23, 24, 25, 26, 27)) %>% 
+  group_by(edad) %>% 
+  summarise(cant_vict_edad = n())
+  
+```
+```{r}
+victimas_parque %>%
+  filter(edad %in% c(19, 20, 21, 22, 23, 24, 25, 26, 27)) %>% 
+  group_by(edad) %>% 
+  summarise(cant_vict_edad = n()) %>% 
+  arrange(desc(cant_vict_edad))
+```
+
+
 
 ```{r}
 victimas_parque %>% 
@@ -131,6 +153,31 @@ victimas_parque %>%
   group_by(as.character(militancia)) %>% 
   summarise(cant_por_militancia = n()) %>% 
   arrange(desc(cant_por_militancia))
+```
+```{r}
+victimas_parque %>% 
+  filter(militancia != "list(listado = character(0))") %>% 
+  group_by(as.character(militancia), ocupaciones) %>% 
+  summarise(cant_por_militancia = n()) %>% 
+  arrange(desc(cant_por_militancia))
+```
+
+
+```{r}
+victimas_parque %>% 
+  filter(!is.na(lugar_de_secuestro)) %>% 
+  group_by(lugar_de_secuestro, ocupaciones) %>%
+  filter(lugar_de_secuestro == "MAR DEL PLATA. BS. AS.") %>% 
+  summarise(cantidad_lugar = n()) %>% 
+  arrange(desc(cantidad_lugar)) 
+```
+```{r}
+victimas_parque %>% 
+  filter(!is.na(lugar_de_secuestro)) %>% 
+  group_by(lugar_de_secuestro, as.character(militancia)) %>%
+  filter(lugar_de_secuestro == "MAR DEL PLATA. BS. AS.") %>% 
+  summarise(cantidad_lugar = n()) %>% 
+  arrange(desc(cantidad_lugar)) 
 ```
 
 
@@ -176,7 +223,7 @@ Exploro los lugares de secuestro de más de 100 victimas, dejando de lado los na
 ```{r}
 victimas_denuncia %>% 
   filter(!is.na(lugar_detencion_secuestro)) %>% 
-  group_by(lugar_detencion_secuestro) %>% 
+  group_by(lugar_detencion_secuestro, ) %>% 
   summarise(cantidad_lugar = n()) %>% 
   filter(cantidad_lugar > 100) %>% 
   arrange(desc(cantidad_lugar)) 
@@ -225,6 +272,9 @@ victimas_denuncia %>%
 ```
 
 
+```{r}
+
+```
 
 
 
