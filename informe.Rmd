@@ -10,22 +10,28 @@ Hola Clari decime que funciona
 knitr::opts_chunk$set(echo = TRUE)
 library(presentes)
 library(dplyr)
+library(tidyr)
 ```
 
 ## Introducción
 
 El presente informe consiste en el análisis de los datos del paquete "presentes", el cual reúne la información oficial sobre víctimas de la dictadura militar entre el 24 de marzo de 1976 y el 10 de diciembre de 1983 en Argentina, como también de años previos al inicio formal del golpe de estado militar. 
 
-Las fuentes principales de los datos del paquete provienen del Registro Único de Víctimas del Terrorismo de Estado (RUVTE),dependiente de la Secretaría de Derechos Humanos y Pluralismo Cultural del Ministerio de Justicia y Derechos Humanos de la Nación y del Monumento a las Víctimas del Terrorismo de Estado, realizado por el Consejo de Gestión del Parque de la Memoria y del Monumento a las Víctimas del Terrorismo de Estado, creado por la ley 3078 de la Ciudad de Buenos Aires.
+Las fuentes principales de los datos del paquete provienen de:
+Registro Único de Víctimas del Terrorismo de Estado (RUVTE), dependiente de la Secretaría de Derechos Humanos y Pluralismo Cultural del Ministerio de Justicia y Derechos Humanos de la Nación
+https://datos.gob.ar/dataset/justicia-registro-unificado-victimas-terrorismo-estado--ruvte-
+Monumento a las Víctimas del Terrorismo de Estado, realizado por el Consejo de Gestión del Parque de la Memoria y del Monumento a las Víctimas del Terrorismo de Estado, creado por la ley 3078 de la Ciudad de Buenos Aires.
+http://basededatos.parquedelamemoria.org.ar/
 
-Haremos hincapié en observar las variables que contienen la edad de las víctimas, las ocupaciones y sus espacios de militancia, cuáles fueron las ciudades y en qué años sucedieron los secuestros y asesinatos.
+
+Haremos hincapié en observar las variables que contienen la edad de las víctimas, las ocupaciones y sus espacios de militancia, cuáles fueron las ciudades en las que ocurrieron los secuestros y asesinatos, y en qué años sucedieron.
 
 No queremos dejar de mencionar que, más allá de que los datos recabados indican un número de 8753 victimas, existe un gran número de victimas desaparecidas que aún no han podido ser identificadxs.
 
 
 ## Exploración de los datos
 
-DECIS QUE PONEMOS TODAS -porque son parte del paquete- O DEJAMOS SOLO LOS DATOS CON LOS QUE TRABAJAMOS?
+En un primer paso, consideramos necesario poder explorar el paquete para conocer qué variables y observaciones contiene.
 ```{r}
 victimas_parque <- presentes::parque_de_la_memoria
 victimas_apodo <- presentes::apodos
@@ -40,15 +46,14 @@ Selección de variables de victimas_parque:
 victimas_parque <- select(parque_de_la_memoria, id, edad, fecha_de_secuestro, ano_en_monumento, lugar_de_secuestro, ocupaciones, sexo, militancia)
 ```
 
-Exploramos las especificaciones de victimas_parque
+Ahora, exploramos las especificaciones de victimas_parque. Queremos saber qué contiene.
 ```{r}
 victimas_parque %>% 
   glimpse()
 ```
 
-Exploración datos de victimas_parque
 
-Exploración sexo de las víctimas
+Exploración por sexo de las víctimas
 ```{r}
 victimas_parque %>% 
   group_by(sexo) %>% 
@@ -57,8 +62,7 @@ victimas_parque %>%
   rename("Víctimas" = cantidad_sexo, "Sexo" = sexo)
 ```
 
-Exploración edad de las victimas
-
+Exploración por edad de las victimas
 ```{r}
 victimas_parque %>% 
   group_by(edad) %>% 
@@ -67,6 +71,7 @@ victimas_parque %>%
   rename("Edad" = edad, "Víctimas" = cantidad)
 ```
 
+Una vez filtrado por edad, nos interesa poder cruzar la cantidad de víctimas por edad y por sexo.
 ```{r}
 victimas_parque %>% 
   group_by(sexo, edad) %>% 
@@ -75,7 +80,15 @@ victimas_parque %>%
   rename("Edad" = edad, "Sexo" = sexo, "Víctimas" = cantidad)
 ```
 
-Exploración edad y ocupaciones de las victimas
+Nos interesa incoporar la variable ocupaciones.
+```{r}
+victimas_parque %>% 
+  group_by(ocupaciones) %>% 
+  summarise(cant_ocupaciones = n()) %>% 
+  arrange(desc(cant_ocupaciones)) 
+```
+
+También exploramos por edad y ocupaciones de las víctimas.
 ```{r}
 victimas_parque %>%
   filter(!is.na(ocupaciones)) %>% 
@@ -84,8 +97,6 @@ victimas_parque %>%
   arrange(desc(cantidad))%>% 
   rename("Edad" = edad, "Ocupaciones" = ocupaciones, "Víctimas" = cantidad )
 ```
-
-ACÁ SI QUEREMOS PODEMOS SACAR LOS DATOS FALTANTES(NA)
 
 Exploración por ocupación y sexo, filtrando por cantidad de víctimas con x ocupacion mayor a 50, se puede filtrar para que no aparezca el na
 ```{r}
@@ -97,12 +108,19 @@ victimas_parque %>%
   rename("Ocupaciones" = ocupaciones, "Sexo" = sexo, "Víctimas" = cant_ocupaciones)
 ```
 
+Ahora procedemos a eliminar todos los datos faltantes (NA) de la tabla.
 ```{r}
 victimas_parque %>% 
-  group_by(ocupaciones) %>% 
+  filter(!is.na(ocupaciones)) %>% 
+  group_by(ocupaciones,sexo) %>% 
   summarise(cant_ocupaciones = n()) %>% 
-  arrange(desc(cant_ocupaciones)) 
+  arrange(desc(cant_ocupaciones)) %>% 
+  filter(cant_ocupaciones > 50) %>% 
+  rename("Ocupaciones" = ocupaciones, "Sexo" = sexo, "Víctimas" = cant_ocupaciones)
 ```
+
+
+
 
 Exploro por año
 ```{r}
@@ -115,8 +133,7 @@ victimas_parque %>%
   rename("Año de secuestro/asesinato" = anio, "Víctimas" = victimas_por_anio)
 ```
 
-Victimas por edad y año de secuestro
-
+Queremos saber cuáles fueron los años con mayor cantidad de asesinatos y secuestros. Por lo que cruzamos la cantidad de víctimas por edad y año de secuestro.
 ```{r}
 victimas_parque %>% 
   group_by(ano_en_monumento) %>% 
@@ -126,7 +143,8 @@ victimas_parque %>%
   arrange(desc(victimas_por_anio)) %>% 
   rename("Edad" = edad, "Año de secuestro/asesinato" = anio, "Víctimas" = victimas_por_anio )
 ```
-Exploración victimas por edad, año de secuestro y ocupacion
+
+Exploración victimas por edad, año de secuestro y ocupación
 ```{r}
 victimas_parque %>% 
   group_by(ano_en_monumento) %>% 
@@ -138,6 +156,7 @@ victimas_parque %>%
   rename("Edad" = edad, "Año de secuestro/asesinato" = anio, "Ocupaciones" = ocupaciones, "Víctimas" = victimas_por_anio)
 ```
 
+Filtramos víctimas por edad universitaria.
 ```{r}
 victimas_parque %>%
   filter(edad %in% c(19, 20, 21, 22, 23, 24, 25, 26, 27)) %>% 
@@ -146,7 +165,8 @@ victimas_parque %>%
   rename("Edad" = edad, "Víctimas" = cant_vict_edad)
   
 ```
-ESTO ES LO MISMO DE ARRIBA ORDENADO POR CANTIDAD DE MAYO A MENOR
+
+Ahora ordenamos por cantidad de mayor a menor.
 ```{r}
 victimas_parque %>%
   filter(edad %in% c(19, 20, 21, 22, 23, 24, 25, 26, 27)) %>% 
@@ -179,6 +199,7 @@ victimas_parque %>%
   summarise(cant_por_militancia = n()) %>% 
   arrange(desc(cant_por_militancia))
 ```
+
 ```{r}
 victimas_parque %>% 
   filter(militancia != "list(listado = character(0))", !is.na(lugar_de_secuestro)) %>%
@@ -222,7 +243,7 @@ victimas_parque %>%
 
 Exploración de datos de dataframe victimas_accionar_represivo_ilegal
 ```{r}
-victimas_denuncia <- select(victimas_accionar_represivo_ilegal, id_unico_ruvte, edad_al_momento_del_hecho_numerico, fecha_detencion_secuestro, lugar_detencion_secuestro,provincia_nacimiento, tipificacion_ruvte)
+victimas_denuncia <- select(victimas_accionar_represivo_ilegal, id_unico_ruvte, fecha_detencion_secuestro, lugar_detencion_secuestro,provincia_nacimiento, tipificacion_ruvte)
 ```
 
 ```{r}
