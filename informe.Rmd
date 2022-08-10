@@ -4,6 +4,7 @@ author: "Alberto Fernandez y Clara Bonpland Mignaquy"
 output: html_document
 ---
 Hola Albe
+Hola Clari decime que funciona
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
