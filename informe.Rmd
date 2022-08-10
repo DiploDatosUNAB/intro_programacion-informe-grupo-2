@@ -18,13 +18,14 @@ El presente informe consiste en el análisis de los datos del paquete "presentes
 
 Las fuentes principales de los datos del paquete provienen del Registro Único de Víctimas del Terrorismo de Estado (RUVTE),dependiente de la Secretaría de Derechos Humanos y Pluralismo Cultural del Ministerio de Justicia y Derechos Humanos de la Nación y del Monumento a las Víctimas del Terrorismo de Estado, realizado por el Consejo de Gestión del Parque de la Memoria y del Monumento a las Víctimas del Terrorismo de Estado, creado por la ley 3078 de la Ciudad de Buenos Aires.
 
-Haremos hincapié en observar las variables que contienen la edad de las víctimas, cuáles fueron las ciudades y en qué años sucedieron los secuestros y asesinatos, las ocupaciones y espacios de militancia.
+Haremos hincapié en observar las variables que contienen la edad de las víctimas, las ocupaciones y sus espacios de militancia, cuáles fueron las ciudades y en qué años sucedieron los secuestros y asesinatos.
 
 No queremos dejar de mencionar que, más allá de que los datos recabados indican un número de 8753 victimas, existe un gran número de victimas desaparecidas que aún no han podido ser identificadxs.
 
 
 ## Exploración de los datos
 
+DECIS QUE PONEMOS TODAS -porque son parte del paquete- O DEJAMOS SOLO LOS DATOS CON LOS QUE TRABAJAMOS?
 ```{r}
 victimas_parque <- presentes::parque_de_la_memoria
 victimas_apodo <- presentes::apodos
@@ -34,12 +35,12 @@ centros_clandestinos <- presentes::centros_clandestinos_detencion
 
 ```
 
-Selección de variables del dataframe victimas_parque:
+Selección de variables de victimas_parque:
 ```{r}
 victimas_parque <- select(parque_de_la_memoria, id, edad, fecha_de_secuestro, ano_en_monumento, lugar_de_secuestro, ocupaciones, sexo, militancia)
 ```
 
-Exploramos las especificaciones del dataframe
+Exploramos las especificaciones de victimas_parque
 ```{r}
 victimas_parque %>% 
   glimpse()
@@ -57,24 +58,22 @@ victimas_parque %>%
 ```
 
 Exploración edad de las victimas
+
 ```{r}
 victimas_parque %>% 
-  group_by(edad, sexo) %>% 
+  group_by(edad) %>% 
+  summarise(cantidad = n()) %>% 
+  arrange(desc(cantidad)) %>% 
+  rename("Edad" = edad, "Víctimas" = cantidad)
+```
+
+```{r}
+victimas_parque %>% 
+  group_by(sexo, edad) %>% 
   summarise(cantidad = n()) %>% 
   arrange(desc(cantidad)) %>% 
   rename("Edad" = edad, "Sexo" = sexo, "Víctimas" = cantidad)
 ```
-
-ESTO LO SACARÍA DIRECTAMENTE
-
-Quizás podemos mencionarlo como datos raros...
-Esto no da bien los calculos, de hecho toma como edad max el 9, es raro... será porque está escrito como caracter y no como numerico?
-```{r}
-victimas_parque %>%
-  filter(as.numeric(edad)) %>% 
-  summarise(edad_max = max(edad, na.rm = TRUE), edad_min = min(edad, na.rm = TRUE), edad_media = mean(edad, na.rm = TRUE), edad_sd = sd(edad, na.rm = TRUE))
-```
-
 
 Exploración edad y ocupaciones de las victimas
 ```{r}
@@ -97,8 +96,15 @@ victimas_parque %>%
   filter(cant_ocupaciones > 50) %>% 
   rename("Ocupaciones" = ocupaciones, "Sexo" = sexo, "Víctimas" = cant_ocupaciones)
 ```
-Exploro por año
 
+```{r}
+victimas_parque %>% 
+  group_by(ocupaciones) %>% 
+  summarise(cant_ocupaciones = n()) %>% 
+  arrange(desc(cant_ocupaciones)) 
+```
+
+Exploro por año
 ```{r}
 victimas_parque %>% 
   group_by(ano_en_monumento) %>% 
@@ -125,7 +131,7 @@ Exploración victimas por edad, año de secuestro y ocupacion
 victimas_parque %>% 
   group_by(ano_en_monumento) %>% 
   mutate(anio = as.numeric(ano_en_monumento)) %>% 
-  group_by(edad, anio, ocupaciones) %>% 
+  group_by(anio, edad, ocupaciones) %>% 
   filter(!is.na(ocupaciones)) %>% 
   summarise(victimas_por_anio = n()) %>% 
   arrange(desc(victimas_por_anio)) %>% 
@@ -150,6 +156,7 @@ victimas_parque %>%
   rename("Edad" = edad, "Víctimas" = cant_vict_edad)
 ```
 
+Exploración por militancia
 ```{r}
 victimas_parque %>% 
   filter(militancia != "list(listado = character(0))") %>% 
@@ -157,6 +164,7 @@ victimas_parque %>%
   summarise(cant_por_militancia = n()) %>% 
   arrange(desc(cant_por_militancia)) 
 ```
+
 ```{r}
 victimas_parque %>% 
   filter(militancia != "list(listado = character(0))") %>% 
@@ -170,6 +178,23 @@ victimas_parque %>%
   group_by(as.character(militancia), ocupaciones) %>% 
   summarise(cant_por_militancia = n()) %>% 
   arrange(desc(cant_por_militancia))
+```
+```{r}
+victimas_parque %>% 
+  filter(militancia != "list(listado = character(0))", !is.na(lugar_de_secuestro)) %>%
+  group_by(as.character(militancia), lugar_de_secuestro) %>% 
+  summarise(cant_por_militancia = n()) %>% 
+  arrange(desc(cant_por_militancia)) 
+```
+
+
+```{r}
+victimas_parque %>% 
+  filter(!is.na(lugar_de_secuestro)) %>% 
+  group_by(lugar_de_secuestro, ocupaciones, edad) %>%
+  summarise(cantidad_lugar = n()) %>% 
+  arrange(desc(cantidad_lugar)) %>% 
+  rename("Lugar de secuestro" = lugar_de_secuestro, "Ocupaciones" = ocupaciones, "Edad" = edad, "Víctimas" = cantidad_lugar)
 ```
 
 
@@ -218,14 +243,6 @@ victimas_denuncia %>%
   summarise(edad_max = max(edad_al_momento_del_hecho_numerico, na.rm = TRUE), edad_min = min(edad_al_momento_del_hecho_numerico, na.rm = TRUE), edad_media = mean(edad_al_momento_del_hecho_numerico, na.rm = TRUE), edad_sd = sd(edad_al_momento_del_hecho_numerico, na.rm = TRUE)) %>% 
   rename("Edad máxima" = edad_max, "Edad mínima" = edad_min, "Edad media" = edad_media, "Desviación estándar" = edad_sd)
 ```
-ESTO LO BORRAMOS NO?
-Exploración cantidad de nacidos en cautiverio (son el 0)
-```{r}
-victimas_denuncia %>% 
-  filter(edad_al_momento_del_hecho_numerico == 0) %>% 
-  summarise(cantidad_nacidos_cautiverio = n())
-```
-
 
 Exploro lugar de secuestro, dejando de lado los datos faltantes(na)
 ```{r}
@@ -240,12 +257,24 @@ Exploro los lugares de secuestro de más de 100 victimas, dejando de lado los na
 ```{r}
 victimas_denuncia %>% 
   filter(!is.na(lugar_detencion_secuestro)) %>% 
-  group_by(lugar_detencion_secuestro, ) %>% 
+  group_by(lugar_detencion_secuestro) %>% 
   summarise(cantidad_lugar = n()) %>% 
   filter(cantidad_lugar > 100) %>% 
   arrange(desc(cantidad_lugar)) %>% 
   rename("Lugar de detención" = lugar_detencion_secuestro, "Víctimas" = cantidad_lugar)
 ```
+
+```{r}
+victimas_denuncia %>% 
+  filter(!is.na(lugar_detencion_secuestro)) %>% 
+  group_by(lugar_detencion_secuestro) %>% 
+  summarise(cantidad_lugar = n()) %>% 
+  filter(cantidad_lugar > 100) %>% 
+  arrange(desc(cantidad_lugar)) %>% 
+  rename("Lugar de detención" = lugar_detencion_secuestro, "Víctimas" = cantidad_lugar)
+```
+
+
 
 Cuento la cantidad de victimas cuyo lugar de detención no está determinado
 ```{r}
@@ -253,16 +282,27 @@ victimas_denuncia %>%
   summarise(cantidad_nas_lugar_secuestro = sum(is.na(lugar_detencion_secuestro))) %>% 
   rename("Cantidad de víctimas sin lugar de detención determinado" = cantidad_nas_lugar_secuestro)
 ```
-exploro la fecha de secuestro, PREGUNTAR A ELIO COMO TOMO UN AÑO SI LA FECHA ESTA EN DD/MM/AAA
+exploro la fecha de secuestro
 ```{r}
 victimas_denuncia %>% 
   group_by(fecha_detencion_secuestro, lugar_detencion_secuestro) %>% 
   summarise(cantidad_fecha = n()) %>% 
   arrange(desc(cantidad_fecha)) %>% 
-  rename("Fecha de detención" = fecha_detencion_secuestro, "Lugar de detención" = lugar_detencion_secuestro, "Víctimas" = cantidad_fecha)
-  
+  rename("Lugar de detención" = lugar_detencion_secuestro, "Víctimas" = cantidad_fecha, "Fecha de Detención" = fecha_detencion_secuestro)
 ```
 
+
+
+exploro la fecha de secuestro, aca cambié la fecha que estaba como caracter a formsto fecha
+```{r}
+victimas_denuncia %>% 
+  group_by(as.Date(fecha_detencion_secuestro), lugar_detencion_secuestro) %>% 
+  summarise(cantidad_fecha = n()) %>% 
+  arrange(desc(cantidad_fecha)) %>% 
+  rename("Lugar de detención" = lugar_detencion_secuestro, "Víctimas" = cantidad_fecha)
+  
+```
+CREO QUE SACARÍA LOS CENTROS CLANDESTINOS, PORQUE AL NO PODER FILTRAR POR PALABRA QUE ESTÉ INCLUIDA EN LA UBICACIÓN(QUE ES MUY ESPECIFICA, TIRA DIRECCION EXACTA) ES MUY DIFICIL QUE TENGAMOS DATOS INTERESANTES A OBSERVAR
 Exploración Centros clandestinos
 ```{r}
 centros_clandestinos %>% 
@@ -289,11 +329,13 @@ victimas_denuncia %>%
   rename("Tipificación del hecho" = tipificacion_ruvte,"Lugar de detención" = lugar_detencion_secuestro, "Víctimas" = tipos)
 ```
 
-
 ```{r}
-
+victimas_denuncia %>% 
+  group_by(tipificacion_ruvte, lugar_detencion_secuestro, edad_al_momento_del_hecho_numerico) %>% 
+  summarise(tipos = n()) %>% 
+  arrange(desc(tipos)) %>% 
+  rename("Tipificación del hecho" = tipificacion_ruvte,"Lugar de detención" = lugar_detencion_secuestro, "Víctimas" = tipos)
 ```
-
 
 
 ## Hipótesis
