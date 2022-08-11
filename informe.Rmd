@@ -243,7 +243,7 @@ victimas_parque %>%
 
 Exploración de datos de dataframe victimas_accionar_represivo_ilegal
 ```{r}
-victimas_denuncia <- select(victimas_accionar_represivo_ilegal, id_unico_ruvte, fecha_detencion_secuestro, lugar_detencion_secuestro,provincia_nacimiento, tipificacion_ruvte)
+victimas_denuncia <- select(victimas_accionar_represivo_ilegal, id_unico_ruvte, fecha_detencion_secuestro, lugar_detencion_secuestro,provincia_nacimiento, tipificacion_ruvte, edad_al_momento_del_hecho_numerico)
 ```
 
 ```{r}
