@@ -3,14 +3,11 @@ title: "Presentes"
 author: "Alberto Fernandez y Clara Bonpland Mignaquy"
 output: html_document
 ---
-Hola Albe
-Hola Clari decime que funciona
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(presentes)
 library(dplyr)
-library(tidyr)
 ```
 
 ## Introducción
@@ -18,9 +15,13 @@ library(tidyr)
 El presente informe consiste en el análisis de los datos del paquete "presentes", el cual reúne la información oficial sobre víctimas de la dictadura militar entre el 24 de marzo de 1976 y el 10 de diciembre de 1983 en Argentina, como también de años previos al inicio formal del golpe de estado militar. 
 
 Las fuentes principales de los datos del paquete provienen de:
-Registro Único de Víctimas del Terrorismo de Estado (RUVTE), dependiente de la Secretaría de Derechos Humanos y Pluralismo Cultural del Ministerio de Justicia y Derechos Humanos de la Nación
+
+Registro Único de Víctimas del Terrorismo de Estado (RUVTE), dependiente de la Secretaría de Derechos Humanos y Pluralismo Cultural del Ministerio de Justicia y Derechos Humanos de la Nación.
+
 https://datos.gob.ar/dataset/justicia-registro-unificado-victimas-terrorismo-estado--ruvte-
+
 Monumento a las Víctimas del Terrorismo de Estado, realizado por el Consejo de Gestión del Parque de la Memoria y del Monumento a las Víctimas del Terrorismo de Estado, creado por la ley 3078 de la Ciudad de Buenos Aires.
+
 http://basededatos.parquedelamemoria.org.ar/
 
 
@@ -190,24 +191,26 @@ victimas_parque %>%
   group_by(militancia = as.character(militancia), ano_en_monumento) %>% 
   summarise(cant_por_militancia = n()) %>% 
   arrange(desc(cant_por_militancia)) %>% 
-  rename("Espacio de militancia" = militancia, "Víctimas" = cant_por_militancia)
+  rename("Espacio de militancia" = militancia, "Víctimas" = cant_por_militancia, "Año de secuestro o detención" = ano_en_monumento)
 ```
 
 Cruzamos la cantidad de víctimas por espacios de militancia y sus ocupaciones.
 ```{r}
 victimas_parque %>% 
   filter(militancia != "list(listado = character(0))") %>% 
-  group_by(as.character(militancia), ocupaciones) %>% 
+  group_by(militancia = as.character(militancia), ocupaciones) %>% 
   summarise(cant_por_militancia = n()) %>% 
-  arrange(desc(cant_por_militancia))
+  arrange(desc(cant_por_militancia))%>% 
+  rename("Espacio de militancia" = militancia, "Víctimas" = cant_por_militancia, "Ocupaciones" = ocupaciones)
 ```
 Teniendo en cuenta que hay datos faltantes de ocupaciones de las víctimas, dejamos de lado los NA.
 ```{r}
 victimas_parque %>% 
   filter(militancia != "list(listado = character(0))", !is.na(ocupaciones)) %>%
-  group_by(as.character(militancia), ocupaciones) %>% 
+  group_by(militancia = as.character(militancia), ocupaciones) %>% 
   summarise(cant_por_militancia = n()) %>% 
-  arrange(desc(cant_por_militancia)) 
+  arrange(desc(cant_por_militancia)) %>% 
+  rename("Espacio de militancia" = militancia, "Víctimas" = cant_por_militancia, "Ocupaciones" = ocupaciones)
 ```
 
 También queremos conocer los lugares en que ocurrieron los secuestros o detenciones de las víctimas.
@@ -230,7 +233,7 @@ victimas_parque %>%
   rename("Lugar de secuestro" = lugar_de_secuestro, "Ocupaciones" = ocupaciones, "Edad" = edad, "Víctimas" = cantidad_lugar)
 ```
 
-Nos llamó la atención la cantidad de víctimas en Mar de Plata, por lo que buscamos las ocupaciones de las mismas en el lugar.
+Resulta interesante que la ciudad de Mar de Plata se encuentra en 6° lugar de la tabla, por lo que buscamos las ocupaciones de las víctimas en el lugar.
 ```{r}
 victimas_parque %>% 
   filter(!is.na(lugar_de_secuestro)) %>% 
@@ -240,18 +243,18 @@ victimas_parque %>%
   arrange(desc(cantidad_lugar)) %>% 
   rename("Lugar de secuestro" = lugar_de_secuestro, "Ocupaciones" = ocupaciones, "Víctimas" = cantidad_lugar)
 ```
-Los datos anteriores no respondieron lo que buscabamos, y decidimos filtrar por Mar del Plata con los espacios de militancia de las víctimas.
+Como el resto de las ciudades son universitarias, decidimos filtrar por espacios de militancia.
 ```{r}
 victimas_parque %>% 
   filter(!is.na(lugar_de_secuestro)) %>% 
-  group_by(lugar_de_secuestro, as.character(militancia)) %>%
+  group_by(lugar_de_secuestro, militancia = as.character(militancia)) %>%
   filter(lugar_de_secuestro == "MAR DEL PLATA. BS. AS.") %>% 
   summarise(cantidad_lugar = n()) %>% 
   arrange(desc(cantidad_lugar)) %>% 
-  rename("Lugar de secuestro" = lugar_de_secuestro, "Víctimas" = cantidad_lugar)
+  rename("Lugar de secuestro" = lugar_de_secuestro, "Víctimas" = cantidad_lugar, "Espacio de miitancia" = militancia)
 ```
 
-Queremos conocer si las observaciones de victimas_parque mantienen relación con las del dataframe victimas_denuncia.
+Para profundizar el análisis, decidimos incorporar el dataframe victimas_denuncia.
 
 Selección de variables:
 ```{r}
@@ -264,7 +267,7 @@ victimas_denuncia %>%
 ```
 El dataframe victimas_denuncia contiene 8.753 observaciones y 6 variables.
 
-Exploración por edad.A diferencia del dataframe con el que trabajamos anteriormente, en este los años son de tipo numérico.
+Exploración por edad. A diferencia del dataframe con el que trabajamos anteriormente, en este los años son de tipo numérico.
 ```{r}
 victimas_denuncia %>% 
   group_by(edad_al_momento_del_hecho_numerico) %>% 
@@ -289,7 +292,7 @@ victimas_denuncia %>%
   rename("Lugar de detención o secuestro" = lugar_detencion_secuestro, "Víctimas" = cantidad_lugar)
 ```
 
-Filtramos los lugares de secuestro de más de 100 victimas, dejando de lado los datos faltantes.
+Filtramos los lugares de secuestro de más de 100 victimas.
 ```{r}
 victimas_denuncia %>% 
   filter(!is.na(lugar_detencion_secuestro)) %>% 
