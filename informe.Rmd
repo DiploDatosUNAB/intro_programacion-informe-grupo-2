@@ -329,11 +329,5 @@ victimas_denuncia %>%
 
 ## Hipótesis
 
-relaciones?
 
-ocupacion, edad y lugar de secuestro
-
-lugar del secuestro/detencion, ocupacion, militancia
-
-tipificacion del hecho, lugar secuestro/detencion y edad
 

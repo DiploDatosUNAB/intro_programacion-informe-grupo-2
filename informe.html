@@ -728,12 +728,12 @@ año.</p>
   group_by(militancia = as.character(militancia), ano_en_monumento) %&gt;% 
   summarise(cant_por_militancia = n()) %&gt;% 
   arrange(desc(cant_por_militancia)) %&gt;% 
-  rename(&quot;Espacio de militancia&quot; = militancia, &quot;Víctimas&quot; = cant_por_militancia)</code></pre>
+  rename(&quot;Espacio de militancia&quot; = militancia, &quot;Víctimas&quot; = cant_por_militancia, &quot;Año de secuestro o detención&quot; = ano_en_monumento)</code></pre>
 <pre><code>## `summarise()` has grouped output by &#39;militancia&#39;. You can override using the
 ## `.groups` argument.</code></pre>
 <pre><code>## # A tibble: 817 × 3
 ## # Groups:   Espacio de militancia [593]
-##    `Espacio de militancia`                                       ano_e…¹ Vícti…²
+##    `Espacio de militancia`                                       Año d…¹ Vícti…²
 ##    &lt;chr&gt;                                                         &lt;chr&gt;     &lt;int&gt;
 ##  1 &quot;list(listado = \&quot;Montoneros\&quot;)&quot;                              1977        285
 ##  2 &quot;list(listado = \&quot;Montoneros\&quot;)&quot;                              1976        224
@@ -745,21 +745,22 @@ año.</p>
 ##  8 &quot;list(listado = \&quot;Partido Revolucionario de los Trabajadores… 1975         73
 ##  9 &quot;list(listado = \&quot;Partido Revolucionario de los Trabajadores… 1977         70
 ## 10 &quot;list(listado = \&quot;Militante sindical\&quot;)&quot;                      1976         69
-## # … with 807 more rows, and abbreviated variable names ¹​ano_en_monumento,
-## #   ²​Víctimas
+## # … with 807 more rows, and abbreviated variable names
+## #   ¹​`Año de secuestro o detención`, ²​Víctimas
 ## # ℹ Use `print(n = ...)` to see more rows</code></pre>
 <p>Cruzamos la cantidad de víctimas por espacios de militancia y sus
 ocupaciones.</p>
 <pre class="r"><code>victimas_parque %&gt;% 
   filter(militancia != &quot;list(listado = character(0))&quot;) %&gt;% 
-  group_by(as.character(militancia), ocupaciones) %&gt;% 
+  group_by(militancia = as.character(militancia), ocupaciones) %&gt;% 
   summarise(cant_por_militancia = n()) %&gt;% 
-  arrange(desc(cant_por_militancia))</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;as.character(militancia)&#39;. You can
-## override using the `.groups` argument.</code></pre>
+  arrange(desc(cant_por_militancia))%&gt;% 
+  rename(&quot;Espacio de militancia&quot; = militancia, &quot;Víctimas&quot; = cant_por_militancia, &quot;Ocupaciones&quot; = ocupaciones)</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;militancia&#39;. You can override using the
+## `.groups` argument.</code></pre>
 <pre><code>## # A tibble: 2,292 × 3
-## # Groups:   as.character(militancia) [593]
-##    `as.character(militancia)`                                    ocupa…¹ cant_…²
+## # Groups:   Espacio de militancia [593]
+##    `Espacio de militancia`                                       Ocupa…¹ Vícti…²
 ##    &lt;chr&gt;                                                         &lt;chr&gt;     &lt;int&gt;
 ##  1 &quot;list(listado = \&quot;Montoneros\&quot;)&quot;                              &lt;NA&gt;        219
 ##  2 &quot;list(listado = \&quot;Partido Revolucionario de los Trabajadores… &lt;NA&gt;        143
@@ -771,21 +772,22 @@ ocupaciones.</p>
 ##  8 &quot;list(listado = \&quot;Partido Revolucionario de los Trabajadores… Estudi…      32
 ##  9 &quot;list(listado = \&quot;Juventud Universitaria Peronista (JUP)\&quot;)&quot;  Estudi…      27
 ## 10 &quot;list(listado = \&quot;Partido Comunista Marxista Leninista (PCML… &lt;NA&gt;         27
-## # … with 2,282 more rows, and abbreviated variable names ¹​ocupaciones,
-## #   ²​cant_por_militancia
+## # … with 2,282 more rows, and abbreviated variable names ¹​Ocupaciones,
+## #   ²​Víctimas
 ## # ℹ Use `print(n = ...)` to see more rows</code></pre>
 <p>Teniendo en cuenta que hay datos faltantes de ocupaciones de las
 víctimas, dejamos de lado los NA.</p>
 <pre class="r"><code>victimas_parque %&gt;% 
   filter(militancia != &quot;list(listado = character(0))&quot;, !is.na(ocupaciones)) %&gt;%
-  group_by(as.character(militancia), ocupaciones) %&gt;% 
+  group_by(militancia = as.character(militancia), ocupaciones) %&gt;% 
   summarise(cant_por_militancia = n()) %&gt;% 
-  arrange(desc(cant_por_militancia)) </code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;as.character(militancia)&#39;. You can
-## override using the `.groups` argument.</code></pre>
+  arrange(desc(cant_por_militancia)) %&gt;% 
+  rename(&quot;Espacio de militancia&quot; = militancia, &quot;Víctimas&quot; = cant_por_militancia, &quot;Ocupaciones&quot; = ocupaciones)</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;militancia&#39;. You can override using the
+## `.groups` argument.</code></pre>
 <pre><code>## # A tibble: 2,132 × 3
-## # Groups:   as.character(militancia) [495]
-##    `as.character(militancia)`                                    ocupa…¹ cant_…²
+## # Groups:   Espacio de militancia [495]
+##    `Espacio de militancia`                                       Ocupa…¹ Vícti…²
 ##    &lt;chr&gt;                                                         &lt;chr&gt;     &lt;int&gt;
 ##  1 &quot;list(listado = \&quot;Juventud Universitaria Peronista (JUP)\&quot;)&quot;  Estudi…      66
 ##  2 &quot;list(listado = \&quot;Montoneros\&quot;)&quot;                              Estudi…      53
@@ -797,8 +799,8 @@ víctimas, dejamos de lado los NA.</p>
 ##  8 &quot;list(listado = \&quot;Juventud Peronista (JP)\&quot;)&quot;                 Estudi…      14
 ##  9 &quot;list(listado = \&quot;Partido Revolucionario de los Trabajadores… Estudi…      13
 ## 10 &quot;list(listado = c(\&quot;Juventud Universitaria Peronista (JUP)\&quot;… Estudi…      13
-## # … with 2,122 more rows, and abbreviated variable names ¹​ocupaciones,
-## #   ²​cant_por_militancia
+## # … with 2,122 more rows, and abbreviated variable names ¹​Ocupaciones,
+## #   ²​Víctimas
 ## # ℹ Use `print(n = ...)` to see more rows</code></pre>
 <p>También queremos conocer los lugares en que ocurrieron los secuestros
 o detenciones de las víctimas.</p>
@@ -849,8 +851,9 @@ las víctimas.</p>
 ## 10 CAPITAL FEDERAL      Estudiante Universitario 24          13
 ## # … with 6,151 more rows
 ## # ℹ Use `print(n = ...)` to see more rows</code></pre>
-<p>Nos llamó la atención la cantidad de víctimas en Mar de Plata, por lo
-que buscamos las ocupaciones de las mismas en el lugar.</p>
+<p>Resulta interesante que la ciudad de Mar de Plata se encuentra en 6°
+lugar de la tabla, por lo que buscamos las ocupaciones de las víctimas
+en el lugar.</p>
 <pre class="r"><code>victimas_parque %&gt;% 
   filter(!is.na(lugar_de_secuestro)) %&gt;% 
   group_by(lugar_de_secuestro, ocupaciones) %&gt;%
@@ -876,21 +879,20 @@ que buscamos las ocupaciones de las mismas en el lugar.</p>
 ## 10 MAR DEL PLATA. BS. AS. Obrero De La Construcción        2
 ## # … with 97 more rows
 ## # ℹ Use `print(n = ...)` to see more rows</code></pre>
-<p>Los datos anteriores no respondieron lo que buscabamos, y decidimos
-filtrar por Mar del Plata con los espacios de militancia de las
-víctimas.</p>
+<p>Como el resto de las ciudades son universitarias, decidimos filtrar
+por espacios de militancia.</p>
 <pre class="r"><code>victimas_parque %&gt;% 
   filter(!is.na(lugar_de_secuestro)) %&gt;% 
-  group_by(lugar_de_secuestro, as.character(militancia)) %&gt;%
+  group_by(lugar_de_secuestro, militancia = as.character(militancia)) %&gt;%
   filter(lugar_de_secuestro == &quot;MAR DEL PLATA. BS. AS.&quot;) %&gt;% 
   summarise(cantidad_lugar = n()) %&gt;% 
   arrange(desc(cantidad_lugar)) %&gt;% 
-  rename(&quot;Lugar de secuestro&quot; = lugar_de_secuestro, &quot;Víctimas&quot; = cantidad_lugar)</code></pre>
+  rename(&quot;Lugar de secuestro&quot; = lugar_de_secuestro, &quot;Víctimas&quot; = cantidad_lugar, &quot;Espacio de miitancia&quot; = militancia)</code></pre>
 <pre><code>## `summarise()` has grouped output by &#39;lugar_de_secuestro&#39;. You can override
 ## using the `.groups` argument.</code></pre>
 <pre><code>## # A tibble: 26 × 3
 ## # Groups:   Lugar de secuestro [1]
-##    `Lugar de secuestro`   `as.character(militancia)`                     Vícti…¹
+##    `Lugar de secuestro`   `Espacio de miitancia`                         Vícti…¹
 ##    &lt;chr&gt;                  &lt;chr&gt;                                            &lt;int&gt;
 ##  1 MAR DEL PLATA. BS. AS. &quot;list(listado = character(0))&quot;                      93
 ##  2 MAR DEL PLATA. BS. AS. &quot;list(listado = \&quot;Partido Socialista de los T…      20
@@ -904,8 +906,8 @@ víctimas.</p>
 ## 10 MAR DEL PLATA. BS. AS. &quot;list(listado = \&quot;Ejército Revolucionario del…       1
 ## # … with 16 more rows, and abbreviated variable name ¹​Víctimas
 ## # ℹ Use `print(n = ...)` to see more rows</code></pre>
-<p>Queremos conocer si las observaciones de victimas_parque mantienen
-relación con las del dataframe victimas_denuncia.</p>
+<p>Para profundizar el análisis, decidimos incorporar el dataframe
+victimas_denuncia.</p>
 <p>Selección de variables:</p>
 <pre class="r"><code>victimas_denuncia &lt;- select(victimas_accionar_represivo_ilegal, id_unico_ruvte, fecha_detencion_secuestro, lugar_detencion_secuestro, provincia_nacimiento, tipificacion_ruvte, edad_al_momento_del_hecho_numerico)</code></pre>
 <p>Ahora, exploramos las especificaciones de victimas_denuncia. Queremos
@@ -922,8 +924,8 @@ saber qué contiene.</p>
 ## $ edad_al_momento_del_hecho_numerico &lt;dbl&gt; 26, 24, 21, 25, 23, 54, 23, 25, 27,…</code></pre>
 <p>El dataframe victimas_denuncia contiene 8.753 observaciones y 6
 variables.</p>
-<p>Exploración por edad.A diferencia del dataframe con el que trabajamos
-anteriormente, en este los años son de tipo numérico.</p>
+<p>Exploración por edad. A diferencia del dataframe con el que
+trabajamos anteriormente, en este los años son de tipo numérico.</p>
 <pre class="r"><code>victimas_denuncia %&gt;% 
   group_by(edad_al_momento_del_hecho_numerico) %&gt;% 
   summarise(cantidad = n()) %&gt;% 
@@ -974,8 +976,7 @@ faltantes(na).</p>
 ## 10 SALTA  CAPITAL  SALTA                               54
 ## # … with 504 more rows
 ## # ℹ Use `print(n = ...)` to see more rows</code></pre>
-<p>Filtramos los lugares de secuestro de más de 100 victimas, dejando de
-lado los datos faltantes.</p>
+<p>Filtramos los lugares de secuestro de más de 100 victimas.</p>
 <pre class="r"><code>victimas_denuncia %&gt;% 
   filter(!is.na(lugar_detencion_secuestro)) %&gt;% 
   group_by(lugar_detencion_secuestro) %&gt;% 
@@ -1054,10 +1055,6 @@ secuestro y la edad de las víctimas.</p>
 </div>
 <div id="hipótesis" class="section level2">
 <h2>Hipótesis</h2>
-<p>relaciones?</p>
-<p>ocupacion, edad y lugar de secuestro</p>
-<p>lugar del secuestro/detencion, ocupacion, militancia</p>
-<p>tipificacion del hecho, lugar secuestro/detencion y edad</p>
 </div>
 
 
