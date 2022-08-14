@@ -27,8 +27,6 @@ http://basededatos.parquedelamemoria.org.ar/
 
 Haremos hincapié en observar las variables que contienen la edad de las víctimas, las ocupaciones y sus espacios de militancia, cuáles fueron las ciudades en las que ocurrieron los secuestros y asesinatos, y en qué años sucedieron.
 
-No queremos dejar de mencionar que, más allá de que los datos recabados indican un número de 8753 victimas, existe un gran número de victimas desaparecidas que aún no han podido ser identificadxs.
-
 
 ## Exploración de los datos
 
@@ -329,5 +327,14 @@ victimas_denuncia %>%
 
 ## Hipótesis
 
+Es necesario mencionar una cuestión muy importante sobre este trabajo, y es que, más allá de que los datos recabados indican un número de 8753 víctimas, existe una gran cantidad de víctimas desaparecidas que aún no han sido encontradas y cuya búsqueda continúa hasta el día de hoy.
+
+En el presente trabajo intentaremos responder, estableciendo las relaciones entre distintas variables, a las preguntas que han surgido luego de explorar los datasets.
+
+Durante los primeros años del golpe de Estado cívico-militar, observamos que la mayor cantidad de secuestros y/o asesinatos de víctimas ocurrieron entre los años 1976 y 1977, y el rango etario predominante de las víctimas fue de 17 a 30 años, en su mayoría estudiantes. Esto nos hace reflexionar si la edad universitaria fue un factor a la hora de convertirse en posibles víctimas. También nos preguntamos cómo varió la edad y ocupación de las víctimas entre los años 1978 y 1982. Si disminuyó el número de secuestros y/o asesinatos, pensar en posibles respuestas que indiquen esta característica.
+
+Las primeras cinco ciudades con más desaparecidos son Capital Federal, Córdoba Capital, La Plata, San Miguel de Tucumán, Rosario y, en un sexto lugar y con más de 200 casos, aparece Mar del Plata. Esto resulta, como mínimo, interesante ya que Mar del Plata no se presenta como una ciudad universitaria. ¿La variable estudiantes explica también los casos ocurridos en las otras cinco ciudades? Debemos incorporar otras categorías al análisis, como son los espacios de militancia. ¿Cuál es la proporción de militantes cuyas ocupaciones están vinculadas a estudios y cuál vinculadas a la actividad sindical? Y establecer relaciones entre estas variables y los lugares de secuestro y/o asesinato de las víctimas.
+
+Dicho lo anterior, nuestra hipótesis se pregunta cuál fue la variable identitaria que más se repite en las víctimas y cuál es su relación con el lugar del hecho y el año en que ocurrieron.
 
 
