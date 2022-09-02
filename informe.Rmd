@@ -307,6 +307,8 @@ victimas_denuncia %>%
 ```
 
 Filtramos los lugares de secuestro de más de 100 victimas.
+#¿Por qué esta decisión?
+Albe, para mi la decisión tiene que ver con encontrar patrones, en qué coinciden los datos, o qué ciudades tuvieron máyor número de víctimas y qué relación tiene esa cantidad con otras variables...  Creo que el 100 fue elegido al azar por los dos, en todo caso la pregunta puede derivar a buscar si qué pasa con los lugares con menos victimas... o dejar de filtrar por 100
 ```{r}
 victimas_denuncia %>% 
   filter(!is.na(lugar_detencion_secuestro)) %>% 
