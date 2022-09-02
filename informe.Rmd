@@ -122,6 +122,7 @@ victimas_parque %>%
   rename("Ocupaciones" = ocupaciones, "Sexo" = sexo, "Víctimas" = cant_ocupaciones)
 ```
 Queremos saber cuáles fueron los años con mayor cantidad de asesinatos y secuestros.
+#acá Elio nos dice "En la documentación de los datos dice que ano_en_documento es el "Año en que se incorpora al monumento del parque" ¿este es el año de la desaparición? ¿Es preciso en todos los casos o quizás en algunos es una estimación? Quizás pueden agregar alguna aclaración sobre de dónde sale este número."
 ```{r}
 victimas_parque %>% 
   group_by(ano_en_monumento) %>% 
