@@ -101,6 +101,7 @@ victimas_parque %>%
 ```
 
 Exploramos por ocupación y sexo, filtrando las ocupaciones con cantidad de víctimas mayor a 50.
+El motivo de la elección surge de buscar qué ocupaciones eran más relevantes y si estas tienen una relación con la militancia.
 ```{r}
 victimas_parque %>% 
   group_by(ocupaciones,sexo) %>% 
