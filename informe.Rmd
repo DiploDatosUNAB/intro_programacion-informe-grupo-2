@@ -73,6 +73,8 @@ victimas_parque %>%
 ```
 
 Una vez filtrado por edad, nos interesa poder cruzar la cantidad de víctimas por edad y por sexo.
+
+#esto da para graficar
 ```{r}
 victimas_parque %>% 
   group_by(edad, sexo) %>% 
