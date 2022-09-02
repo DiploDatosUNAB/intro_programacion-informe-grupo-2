@@ -133,6 +133,9 @@ victimas_parque %>%
   rename("Año de secuestro/asesinato" = anio, "Víctimas" = victimas_por_anio)
 ```
 
+
+
+
  Cruzamos la cantidad de víctimas por edad y año de secuestro o asesinato.
 ```{r}
 victimas_parque %>% 
