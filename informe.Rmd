@@ -286,8 +286,14 @@ victimas_denuncia %>%
 Buscamos el promedio, el valor máximo, el valor mínimo y el desvío estándar de la edad.
 ```{r}
 victimas_denuncia %>% 
-  summarise(edad_max = max(edad_al_momento_del_hecho_numerico, na.rm = TRUE), edad_min = min(edad_al_momento_del_hecho_numerico, na.rm = TRUE), edad_media = mean(edad_al_momento_del_hecho_numerico, na.rm = TRUE), edad_sd = sd(edad_al_momento_del_hecho_numerico, na.rm = TRUE)) %>% 
-  rename("Edad máxima" = edad_max, "Edad mínima" = edad_min, "Edad media" = edad_media, "Desviación estándar" = edad_sd)
+  summarise(edad_max = max(edad_al_momento_del_hecho_numerico, na.rm = TRUE), 
+            edad_min = min(edad_al_momento_del_hecho_numerico, na.rm = TRUE), 
+            edad_media = mean(edad_al_momento_del_hecho_numerico, na.rm = TRUE),
+            edad_sd = sd(edad_al_momento_del_hecho_numerico, na.rm = TRUE)) %>% 
+  rename("Edad máxima" = edad_max, 
+         "Edad mínima" = edad_min, 
+         "Edad media" = edad_media, 
+         "Desviación estándar" = edad_sd)
 ```
 
 Exploramos lugar de secuestro, dejando de lado los datos faltantes(na).
