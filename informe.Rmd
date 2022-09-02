@@ -162,7 +162,7 @@ victimas_parque %>%
 Filtramos víctimas por edad universitaria.
 ```{r}
 victimas_parque %>%
-  filter(edad %in% c(19, 20, 21, 22, 23, 24, 25, 26, 27)) %>% 
+  filter(edad %in% c(19:27)) %>% 
   group_by(edad) %>% 
   summarise(cant_vict_edad = n()) %>% 
   rename("Edad" = edad, "Víctimas" = cant_vict_edad)
