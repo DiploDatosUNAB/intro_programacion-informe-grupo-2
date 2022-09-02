@@ -8,6 +8,7 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 library(presentes)
 library(dplyr)
+library(ggplot2)
 ```
 
 ## Introducción
@@ -67,7 +68,8 @@ victimas_parque %>%
   group_by(edad) %>% 
   summarise(cantidad = n()) %>% 
   arrange(desc(cantidad)) %>% 
-  rename("Edad" = edad, "Víctimas" = cantidad)
+  ggplot(aes(edad, cantidad)) + 
+  geom_col()
 ```
 
 Una vez filtrado por edad, nos interesa poder cruzar la cantidad de víctimas por edad y por sexo.
