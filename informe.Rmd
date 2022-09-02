@@ -316,7 +316,8 @@ victimas_denuncia %>%
   summarise(cantidad_lugar = n()) %>% 
   filter(cantidad_lugar > 100) %>% 
   arrange(desc(cantidad_lugar)) %>% 
-  rename("Lugar de detención o secuestro" = lugar_detencion_secuestro, "Víctimas" = cantidad_lugar)
+  ggplot(aes(lugar_detencion_secuestro, cantidad_lugar)) + 
+  geom_col()
 ```
 
 Contamos la cantidad de victimas cuyo lugar de detención no está determinado.
