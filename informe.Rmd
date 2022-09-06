@@ -65,6 +65,7 @@ victimas_parque %>%
 Exploración por edad de las victimas.
 ```{r}
 victimas_parque %>% 
+  filter(edad != "-") %>% 
   group_by(edad) %>% 
   summarise(cantidad = n()) %>% 
   arrange(desc(cantidad)) %>% 
