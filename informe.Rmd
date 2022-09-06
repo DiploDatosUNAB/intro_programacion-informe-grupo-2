@@ -9,6 +9,8 @@ knitr::opts_chunk$set(echo = TRUE)
 library(presentes)
 library(dplyr)
 library(ggplot2)
+library(lubridate)
+library(tidyr)
 ```
 
 ## Introducción
@@ -355,8 +357,94 @@ En el presente trabajo intentaremos responder, estableciendo las relaciones entr
 
 Durante los primeros años del golpe de Estado cívico-militar, observamos que la mayor cantidad de secuestros y/o asesinatos de víctimas ocurrieron entre los años 1976 y 1977, y el rango etario predominante de las víctimas fue de 17 a 30 años, en su mayoría estudiantes. Esto nos hace reflexionar si la edad universitaria fue un factor a la hora de convertirse en posibles víctimas. También nos preguntamos cómo varió la edad y ocupación de las víctimas entre los años 1978 y 1982. Si disminuyó el número de secuestros y/o asesinatos, pensar en posibles respuestas que indiquen esta característica.
 
+```{r}
+victimas_parque %>%
+  group_by(fecha_de_secuestro) %>% 
+  mutate(fecha = dmy(fecha_de_secuestro)) %>% 
+  mutate(anio = year(fecha)) %>% 
+  group_by(anio, edad, ocupaciones) %>% 
+  filter(!is.na(anio) & !is.na(ocupaciones)) %>% 
+  summarise(victimas_por_anio = n()) %>% 
+  arrange(desc(victimas_por_anio))
+```
+
+Creamos dataset de  las victimas por año de secuestro, con ocupacion Estuadiante desde el 1971 al 1983:
+```{r}
+est_83_71 <- victimas_parque %>%
+  group_by(fecha_de_secuestro) %>% 
+  mutate(fecha = dmy(fecha_de_secuestro)) %>% 
+  mutate(anio = year(fecha)) %>% 
+  group_by(anio, ocupaciones) %>% 
+  filter(!is.na(anio), ocupaciones %in% c("Estudiante Universitario", "Estudiante Universitaria", "Estudiante", "Estudiante Secundario")) %>% 
+  summarise(victimas_por_anio = n()) %>% 
+  arrange(desc(victimas_por_anio)) 
+  
+```
+Graficamos lo anterior
+```{r}
+est_83_71 %>% 
+  ggplot(aes(anio, victimas_por_anio)) +
+  geom_line(aes(color = ocupaciones))
+```
+
+Creo dataset de victimas por edad y ocupacion entre 1978 y 1982
+```{r}
+victimas_78_82 <- victimas_parque %>%
+  group_by(fecha_de_secuestro) %>% 
+  mutate(fecha = dmy(fecha_de_secuestro)) %>% 
+  mutate(anio = year(fecha)) %>% 
+  group_by(anio, ocupaciones, edad) %>% 
+  filter(anio %in% c(1978:1982)) %>% 
+  summarise(victimas_por_anio = n()) %>% 
+  arrange(desc(anio)) 
+  
+```
+Filtro Victimas del 78 al 82, agrupando por su edad y año.
+```{r}
+victimas_78_82 %>% 
+  filter(!is.na(ocupaciones) & edad > 0) %>% 
+  group_by(edad, anio) %>% 
+  summarise(victimas_por_anio = n()) %>% 
+  arrange(desc(victimas_por_anio))
+```
+
+Gráfico de lo anterior, podemos ver otra manera para que quede mejor
+```{r}
+victimas_78_82 %>% 
+  filter(!is.na(ocupaciones) & edad > 0) %>% 
+  group_by(edad, anio) %>% 
+  summarise(victimas_por_anio = n()) %>% 
+  ggplot(aes(anio, victimas_por_anio)) + 
+  geom_jitter(aes(color = edad))
+```
+También nos preguntamos cómo varió la edad y ocupación de las víctimas entre los años 1978 y 1982. Si disminuyó el número de secuestros y/o asesinatos, pensar en posibles respuestas que indiquen esta característica.
+
+
+la edad fue un factor determinante? podemos buscar otras maneras de graficarlo
+```{r}
+victimas_78_82 %>% 
+  filter(edad > 0 & victimas_por_anio > 0) %>% 
+  ggplot(aes(anio, victimas_por_anio)) + 
+  geom_col(aes(color = edad))
+```
+
+como vario la edad y ocupacion de victimas entre 1978 y 1982. disminutyó el numero de hechos? todavia no lo logré
+```{r}
+
+```
+
+
 Las primeras cinco ciudades con más desaparecidos son Capital Federal, Córdoba Capital, La Plata, San Miguel de Tucumán, Rosario y, en un sexto lugar y con más de 200 casos, aparece Mar del Plata. Esto resulta, como mínimo, interesante ya que Mar del Plata no se presenta como una ciudad universitaria. ¿La variable estudiantes explica también los casos ocurridos en las otras cinco ciudades? Debemos incorporar otras categorías al análisis, como son los espacios de militancia. ¿Cuál es la proporción de militantes cuyas ocupaciones están vinculadas a estudios y cuál vinculadas a la actividad sindical? Y establecer relaciones entre estas variables y los lugares de secuestro y/o asesinato de las víctimas.
+
+```{r}
+
+```
+
+
 
 Dicho lo anterior, nuestra hipótesis se pregunta cuál fue la variable identitaria que más se repite en las víctimas y cuál es su relación con el lugar del hecho y el año en que ocurrieron.
 
+variable identitaria más repetida y su relación con el lugar del hecho y el año en que ocurrieron
+```{r}
 
+```
