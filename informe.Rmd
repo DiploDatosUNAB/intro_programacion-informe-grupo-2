@@ -138,10 +138,7 @@ victimas_parque %>%
   rename("Año de secuestro/asesinato" = anio, "Víctimas" = victimas_por_anio)
 ```
 
-
-
-
- Cruzamos la cantidad de víctimas por edad y año de secuestro o asesinato.
+Cruzamos la cantidad de víctimas por edad y año de secuestro o asesinato.
 ```{r}
 victimas_parque %>% 
   group_by(ano_en_monumento) %>% 
@@ -411,7 +408,7 @@ victimas_78_82 %>%
 Gráfico de lo anterior, podemos ver otra manera para que quede mejor
 ```{r}
 victimas_78_82 %>% 
-  filter(!is.na(ocupaciones) & edad > 0) %>% 
+  filter(edad > 0) %>% 
   group_by(edad, anio) %>% 
   summarise(victimas_por_anio = n()) %>% 
   ggplot(aes(anio, victimas_por_anio)) + 
@@ -429,6 +426,14 @@ victimas_78_82 %>%
 ```
 
 como vario la edad y ocupacion de victimas entre 1978 y 1982. disminutyó el numero de hechos? todavia no lo logré
+```{r}
+victimas_78_82 %>% 
+  filter(edad > 0 & edad != "-") %>%
+  group_by(edad,anio) %>% 
+  summarise(cantidad_edad = n()) %>% 
+  ggplot(aes(anio, cantidad_edad)) + 
+  geom_line(aes(color = edad))
+```
 ```{r}
 
 ```
@@ -448,3 +453,49 @@ variable identitaria más repetida y su relación con el lugar del hecho y el a�
 ```{r}
 
 ```
+
+
+DESARMANDO LA TABLA DE MILITANCIA
+```{r}
+militancias <- victimas_parque %>% 
+  tidyr::unnest(militancia) %>% 
+  select(id, ocupaciones, lugar_de_secuestro, listado)
+
+militancias
+
+
+```
+
+```{r}
+militancias %>% 
+  group_by(id) %>% 
+  summarise(cantidad = n()) %>% 
+  filter(cantidad == 1)
+  
+```
+
+victimas con dos espacios de militancia
+```{r}
+militancias %>% 
+  group_by(id, ocupaciones) %>% 
+  summarise(cantidad = n()) %>% 
+  filter(cantidad == 2)
+  
+```
+```{r}
+militancias %>% 
+  group_by(id) %>% 
+  summarise(cantidad = n()) %>% 
+  filter(cantidad == 3)
+  
+```
+```{r}
+militancias %>% 
+  group_by(id, ocupaciones) %>% 
+  summarise(cantidad = n()) %>% 
+  filter(cantidad == 4) 
+  
+  
+```
+
+
