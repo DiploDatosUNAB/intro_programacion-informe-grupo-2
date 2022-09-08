@@ -70,9 +70,7 @@ victimas_parque %>%
   filter(edad != "-") %>% 
   group_by(edad) %>% 
   summarise(cantidad = n()) %>% 
-  arrange(desc(cantidad)) %>% 
-  ggplot(aes(edad, cantidad)) + 
-  geom_col()
+  arrange(desc(cantidad)) 
 ```
 
 Una vez filtrado por edad, nos interesa poder cruzar la cantidad de víctimas por edad y por sexo.
@@ -80,10 +78,12 @@ Una vez filtrado por edad, nos interesa poder cruzar la cantidad de víctimas po
 #esto da para graficar
 ```{r}
 victimas_parque %>% 
+  filter(edad != "-") %>% 
   group_by(edad, sexo) %>% 
   summarise(cantidad = n()) %>% 
-  arrange(desc(cantidad)) %>% 
-  rename("Edad" = edad, "Sexo" = sexo, "Víctimas" = cantidad)
+  arrange(desc(cantidad)) %>%
+  ggplot(aes(edad, cantidad)) + 
+  geom_col(aes(color = sexo)) 
 ```
 
 Nos interesa incoporar la variable ocupaciones.
@@ -481,4 +481,29 @@ militancias %>%
   
 ```
 
+probando codigo para comprara cantidad de victimas por años
+```{r}
+anio_real <- victimas_parque %>%
+  group_by(fecha_de_secuestro) %>% 
+  mutate(fecha = dmy(fecha_de_secuestro)) %>% 
+  mutate(anio = year(fecha)) %>% 
+  group_by(anio) %>% 
+  filter(!is.na(anio)) %>% 
+  summarise(victimas_por_anio = n()) %>% 
+  arrange(desc(victimas_por_anio))
+```
+
+```{r}
+anio_monumento <- victimas_parque %>% 
+  group_by(ano_en_monumento) %>% 
+  mutate(anio = as.numeric(ano_en_monumento)) %>% 
+  group_by(anio) %>% 
+  summarise(victimas_por_anio = n()) %>% 
+  arrange(desc(victimas_por_anio)) 
+```
+Comparación de cantidad de victimas por año con fecha de secuestro y por año con anio en monumeto
+```{r}
+anio_real %>% 
+  left_join(anio_monumento, by = "anio", suffix = c(".anio", ".anio_en_monumento")) 
+```
 
