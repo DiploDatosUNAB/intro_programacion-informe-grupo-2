@@ -329,23 +329,6 @@ victimas_denuncia %>%
   rename("Cantidad de víctimas sin lugar de detención o secuestro determinado" = cantidad_nas_lugar_secuestro)
 ```
 
-Exploramos por tipificación de los hechos y los lugares de detención o secuestro.
-```{r}
-victimas_denuncia %>% 
-  group_by(tipificacion_ruvte, lugar_detencion_secuestro) %>% 
-  summarise(tipos = n()) %>% 
-  arrange(desc(tipos)) %>% 
-  rename("Tipificación del hecho" = tipificacion_ruvte,"Lugar de detención/secuestro" = lugar_detencion_secuestro, "Víctimas" = tipos)
-```
-Cruzamos la tipificación de los hechos con los lugares de detención o secuestro y la edad de las víctimas.
-```{r}
-victimas_denuncia %>% 
-  group_by(tipificacion_ruvte, lugar_detencion_secuestro, edad_al_momento_del_hecho_numerico) %>% 
-  summarise(tipos = n()) %>% 
-  arrange(desc(tipos)) %>% 
-  rename("Tipificación del hecho" = tipificacion_ruvte,"Lugar de detención o secuestro" = lugar_detencion_secuestro, "Víctimas" = tipos)
-```
-
 ## Hipótesis
 
 Es necesario mencionar una cuestión muy importante sobre este trabajo, y es que, más allá de que los datos recabados indican un número de 8753 víctimas, existe una gran cantidad de víctimas desaparecidas que aún no han sido encontradas y cuya búsqueda continúa hasta el día de hoy.
