@@ -459,12 +459,19 @@ DESARMANDO LA TABLA DE MILITANCIA
 ```{r}
 militancias <- victimas_parque %>% 
   tidyr::unnest(militancia) %>% 
-  select(id, ocupaciones, lugar_de_secuestro, listado)
+  select(id, ocupaciones, lugar_de_secuestro, listado, sexo)
 
 militancias
 
 
 ```
+
+Resulta interesante visualizar a los desaparecidos según su sexo.
+
+```{r}
+
+```
+
 
 ```{r}
 militancias %>% 
