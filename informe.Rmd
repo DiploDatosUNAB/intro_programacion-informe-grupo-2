@@ -70,20 +70,19 @@ victimas_parque %>%
   filter(edad != "-") %>% 
   group_by(edad) %>% 
   summarise(cantidad = n()) %>% 
-  arrange(desc(cantidad)) %>% 
-  ggplot(aes(edad, cantidad)) + 
-  geom_col()
+  arrange(desc(cantidad)) 
 ```
 
 Una vez filtrado por edad, nos interesa poder cruzar la cantidad de víctimas por edad y por sexo.
 
-#esto da para graficar
 ```{r}
 victimas_parque %>% 
+  filter(edad != "-") %>% 
   group_by(edad, sexo) %>% 
   summarise(cantidad = n()) %>% 
-  arrange(desc(cantidad)) %>% 
-  rename("Edad" = edad, "Sexo" = sexo, "Víctimas" = cantidad)
+  arrange(desc(edad)) %>%
+  ggplot(aes(edad, cantidad)) + 
+  geom_col(aes(color = sexo)) 
 ```
 
 Nos interesa incoporar la variable ocupaciones.
@@ -127,11 +126,11 @@ victimas_parque %>%
   rename("Ocupaciones" = ocupaciones, "Sexo" = sexo, "Víctimas" = cant_ocupaciones)
 ```
 Queremos saber cuáles fueron los años con mayor cantidad de asesinatos y secuestros.
-#acá Elio nos dice "En la documentación de los datos dice que ano_en_documento es el "Año en que se incorpora al monumento del parque" ¿este es el año de la desaparición? ¿Es preciso en todos los casos o quizás en algunos es una estimación? Quizás pueden agregar alguna aclaración sobre de dónde sale este número."
 ```{r}
 victimas_parque %>% 
-  group_by(ano_en_monumento) %>% 
-  mutate(anio = as.numeric(ano_en_monumento)) %>% 
+  group_by(fecha_de_secuestro) %>% 
+  mutate(fecha = dmy(fecha_de_secuestro)) %>% 
+  mutate(anio = year(fecha)) %>% 
   group_by(anio) %>% 
   summarise(victimas_por_anio = n()) %>% 
   arrange(desc(victimas_por_anio)) %>% 
@@ -141,8 +140,9 @@ victimas_parque %>%
 Cruzamos la cantidad de víctimas por edad y año de secuestro o asesinato.
 ```{r}
 victimas_parque %>% 
-  group_by(ano_en_monumento) %>% 
-  mutate(anio = as.numeric(ano_en_monumento)) %>% 
+  group_by(fecha_de_secuestro) %>% 
+  mutate(fecha = dmy(fecha_de_secuestro)) %>% 
+  mutate(anio = year(fecha)) %>% 
   group_by(edad, anio) %>% 
   summarise(victimas_por_anio = n()) %>% 
   arrange(desc(victimas_por_anio)) %>% 
@@ -152,8 +152,9 @@ victimas_parque %>%
 Buscamos victimas por edad, año de secuestro y ocupación, dejando de lado la variable sexo.
 ```{r}
 victimas_parque %>% 
-  group_by(ano_en_monumento) %>% 
-  mutate(anio = as.numeric(ano_en_monumento)) %>% 
+  group_by(fecha_de_secuestro) %>% 
+  mutate(fecha = dmy(fecha_de_secuestro)) %>% 
+  mutate(anio = year(fecha)) %>% 
   group_by(anio, edad, ocupaciones) %>% 
   filter(!is.na(ocupaciones)) %>% 
   summarise(victimas_por_anio = n()) %>% 
@@ -164,61 +165,53 @@ victimas_parque %>%
 Filtramos víctimas por edad universitaria.
 ```{r}
 victimas_parque %>%
-  filter(edad %in% c(19:27)) %>% 
-  group_by(edad) %>% 
-  summarise(cant_vict_edad = n()) %>% 
-  rename("Edad" = edad, "Víctimas" = cant_vict_edad)
-  
-```
-
-#aca tenemos que elegir si ordenamos por edad o por cantidad de victimas
-
-Ahora ordenamos por cantidad de mayor a menor.
-```{r}
-victimas_parque %>%
   filter(edad %in% c(19, 20, 21, 22, 23, 24, 25, 26, 27)) %>% 
   group_by(edad) %>% 
-  summarise(cant_vict_edad = n()) %>% 
-  arrange(desc(cant_vict_edad)) %>% 
+  summarise(cant_vict_edad = n())  %>% 
   rename("Edad" = edad, "Víctimas" = cant_vict_edad)
 ```
 
 Nos pareció interesante conocer los espacios de militancia de las víctimas.
 ```{r}
-victimas_parque %>% 
-  filter(militancia != "list(listado = character(0))") %>% 
-  group_by(militancia = as.character(militancia)) %>% 
+militancias <- unnest(victimas_parque, militancia) %>% 
+  separate(listado, into = c("orga1", "orga2", "orga3", "orga4"), sep =" - ")
+```
+
+```{r}
+ militancias %>% 
+  group_by(orga1, orga2, orga3, orga4) %>% 
   summarise(cant_por_militancia = n()) %>% 
-  arrange(desc(cant_por_militancia)) %>% 
-  rename("Espacio de militancia" = militancia, "Víctimas" = cant_por_militancia)
+  arrange(desc(cant_por_militancia)) 
 ```
 Exploramos la cantidad de víctimas por espacio de militancia y año.
 ```{r}
-victimas_parque %>% 
-  filter(militancia != "list(listado = character(0))") %>% 
-  group_by(militancia = as.character(militancia), ano_en_monumento) %>% 
+militancias %>%  
+  mutate(fecha = dmy(fecha_de_secuestro)) %>% 
+  mutate(anio = year(fecha)) %>% 
+  group_by(anio, orga1, orga2, orga3, orga4) %>% 
   summarise(cant_por_militancia = n()) %>% 
-  arrange(desc(cant_por_militancia)) %>% 
-  rename("Espacio de militancia" = militancia, "Víctimas" = cant_por_militancia, "Año de secuestro o detención" = ano_en_monumento)
+  arrange(desc(cant_por_militancia)) 
 ```
 
 Cruzamos la cantidad de víctimas por espacios de militancia y sus ocupaciones.
 ```{r}
-victimas_parque %>% 
-  filter(militancia != "list(listado = character(0))") %>% 
-  group_by(militancia = as.character(militancia), ocupaciones) %>% 
+militancias %>%  
+  mutate(fecha = dmy(fecha_de_secuestro)) %>% 
+  mutate(anio = year(fecha)) %>% 
+  group_by(ocupaciones, orga1, orga2, orga3, orga4) %>% 
   summarise(cant_por_militancia = n()) %>% 
-  arrange(desc(cant_por_militancia))%>% 
-  rename("Espacio de militancia" = militancia, "Víctimas" = cant_por_militancia, "Ocupaciones" = ocupaciones)
+  arrange(desc(cant_por_militancia)) 
 ```
-Teniendo en cuenta que hay datos faltantes de ocupaciones de las víctimas, dejamos de lado los NA.
+
+Buscamos cuáles son los espacios de militancia para la ocupación de Estudiantes.
 ```{r}
-victimas_parque %>% 
-  filter(militancia != "list(listado = character(0))", !is.na(ocupaciones)) %>%
-  group_by(militancia = as.character(militancia), ocupaciones) %>% 
+militancias %>% 
+  mutate(fecha = dmy(fecha_de_secuestro)) %>% 
+  mutate(anio = year(fecha)) %>% 
+  group_by(ocupaciones, orga1, orga2, orga3, orga4) %>% 
+  filter(ocupaciones %in% c("Estudiante Universitario", "Estudiante Universitaria", "Estudiante", "Estudiante Secundario")) %>% 
   summarise(cant_por_militancia = n()) %>% 
-  arrange(desc(cant_por_militancia)) %>% 
-  rename("Espacio de militancia" = militancia, "Víctimas" = cant_por_militancia, "Ocupaciones" = ocupaciones)
+  arrange(desc(cant_por_militancia))
 ```
 
 También queremos conocer los lugares en que ocurrieron los secuestros o detenciones de las víctimas.
@@ -253,6 +246,7 @@ victimas_parque %>%
   arrange(desc(cantidad_lugar)) %>% 
   rename("Lugar de secuestro" = lugar_de_secuestro, "Ocupaciones" = ocupaciones, "Víctimas" = cantidad_lugar)
 ```
+
 Como el resto de las ciudades son universitarias, decidimos filtrar por espacios de militancia.
 ```{r}
 victimas_parque %>% 
@@ -283,8 +277,11 @@ victimas_denuncia %>%
   group_by(edad_al_momento_del_hecho_numerico) %>% 
   summarise(cantidad = n()) %>% 
   arrange(desc(cantidad)) %>% 
-  rename("Edad" = edad_al_momento_del_hecho_numerico, "Víctimas" = cantidad)
+  ggplot(aes(edad_al_momento_del_hecho_numerico, cantidad)) + 
+  geom_col()
+  
 ```
+
 Buscamos el promedio, el valor máximo, el valor mínimo y el desvío estándar de la edad.
 ```{r}
 victimas_denuncia %>% 
@@ -297,55 +294,6 @@ victimas_denuncia %>%
          "Edad media" = edad_media, 
          "Desviación estándar" = edad_sd)
 ```
-
-Exploramos lugar de secuestro, dejando de lado los datos faltantes(na).
-```{r}
-victimas_denuncia %>% 
-  filter(!is.na(lugar_detencion_secuestro)) %>% 
-  group_by(lugar_detencion_secuestro) %>% 
-  summarise(cantidad_lugar = n()) %>% 
-  arrange(desc(cantidad_lugar)) %>% 
-  rename("Lugar de detención o secuestro" = lugar_detencion_secuestro, "Víctimas" = cantidad_lugar)
-```
-
-Filtramos los lugares de secuestro de más de 100 victimas.
-#¿Por qué esta decisión?
-Albe, para mi la decisión tiene que ver con encontrar patrones, en qué coinciden los datos, o qué ciudades tuvieron máyor número de víctimas y qué relación tiene esa cantidad con otras variables...  Creo que el 100 fue elegido al azar por los dos, en todo caso la pregunta puede derivar a buscar si qué pasa con los lugares con menos victimas... o dejar de filtrar por 100
-```{r}
-victimas_denuncia %>% 
-  filter(!is.na(lugar_detencion_secuestro)) %>% 
-  group_by(lugar_detencion_secuestro) %>% 
-  summarise(cantidad_lugar = n()) %>% 
-  filter(cantidad_lugar > 100) %>% 
-  arrange(desc(cantidad_lugar)) %>% 
-  ggplot(aes(lugar_detencion_secuestro, cantidad_lugar)) + 
-  geom_col()
-```
-
-Contamos la cantidad de victimas cuyo lugar de detención no está determinado.
-```{r}
-victimas_denuncia %>% 
-  summarise(cantidad_nas_lugar_secuestro = sum(is.na(lugar_detencion_secuestro))) %>% 
-  rename("Cantidad de víctimas sin lugar de detención o secuestro determinado" = cantidad_nas_lugar_secuestro)
-```
-
-Exploramos por tipificación de los hechos y los lugares de detención o secuestro.
-```{r}
-victimas_denuncia %>% 
-  group_by(tipificacion_ruvte, lugar_detencion_secuestro) %>% 
-  summarise(tipos = n()) %>% 
-  arrange(desc(tipos)) %>% 
-  rename("Tipificación del hecho" = tipificacion_ruvte,"Lugar de detención/secuestro" = lugar_detencion_secuestro, "Víctimas" = tipos)
-```
-Cruzamos la tipificación de los hechos con los lugares de detención o secuestro y la edad de las víctimas.
-```{r}
-victimas_denuncia %>% 
-  group_by(tipificacion_ruvte, lugar_detencion_secuestro, edad_al_momento_del_hecho_numerico) %>% 
-  summarise(tipos = n()) %>% 
-  arrange(desc(tipos)) %>% 
-  rename("Tipificación del hecho" = tipificacion_ruvte,"Lugar de detención o secuestro" = lugar_detencion_secuestro, "Víctimas" = tipos)
-```
-
 ## Hipótesis
 
 Es necesario mencionar una cuestión muy importante sobre este trabajo, y es que, más allá de que los datos recabados indican un número de 8753 víctimas, existe una gran cantidad de víctimas desaparecidas que aún no han sido encontradas y cuya búsqueda continúa hasta el día de hoy.
@@ -353,6 +301,18 @@ Es necesario mencionar una cuestión muy importante sobre este trabajo, y es que
 En el presente trabajo intentaremos responder, estableciendo las relaciones entre distintas variables, a las preguntas que han surgido luego de explorar los datasets.
 
 Durante los primeros años del golpe de Estado cívico-militar, observamos que la mayor cantidad de secuestros y/o asesinatos de víctimas ocurrieron entre los años 1976 y 1977, y el rango etario predominante de las víctimas fue de 17 a 30 años, en su mayoría estudiantes. Esto nos hace reflexionar si la edad universitaria fue un factor a la hora de convertirse en posibles víctimas. También nos preguntamos cómo varió la edad y ocupación de las víctimas entre los años 1978 y 1982. Si disminuyó el número de secuestros y/o asesinatos, pensar en posibles respuestas que indiquen esta característica.
+
+```{r}
+victimas_parque %>% 
+  group_by(fecha_de_secuestro) %>% 
+  mutate(fecha = dmy(fecha_de_secuestro)) %>% 
+  mutate(anio = year(fecha)) %>% 
+  group_by(anio) %>% 
+  summarise(victimas_por_anio = n()) %>% 
+  arrange(desc(victimas_por_anio)) %>% 
+  ggplot(aes(anio, victimas_por_anio)) + 
+  geom_col()
+```
 
 ```{r}
 victimas_parque %>%
@@ -412,7 +372,7 @@ victimas_78_82 %>%
   group_by(edad, anio) %>% 
   summarise(victimas_por_anio = n()) %>% 
   ggplot(aes(anio, victimas_por_anio)) + 
-  geom_jitter(aes(color = edad))
+  geom_col(aes(color = edad))
 ```
 También nos preguntamos cómo varió la edad y ocupación de las víctimas entre los años 1978 y 1982. Si disminuyó el número de secuestros y/o asesinatos, pensar en posibles respuestas que indiquen esta característica.
 
@@ -459,18 +419,21 @@ DESARMANDO LA TABLA DE MILITANCIA
 ```{r}
 militancias <- victimas_parque %>% 
   tidyr::unnest(militancia) %>% 
-  select(id, ocupaciones, lugar_de_secuestro, listado, sexo)
+  select(id, ocupaciones, lugar_de_secuestro, listado)
 
 militancias
 
 
 ```
 
-Resulta interesante visualizar a los desaparecidos según su sexo.
-
 ```{r}
-
+militancias %>% 
+  filter(ocupaciones %in% c("Estudiante Universitario", "Estudiante Universitaria", "Estudiante", "Estudiante Secundario")) %>% 
+  group_by(ocupaciones, listado) %>% 
+  summarise(cantidad = n()) %>% 
+  arrange(desc(cantidad))
 ```
+
 
 
 ```{r}
@@ -505,4 +468,38 @@ militancias %>%
   
 ```
 
+probando codigo para comprara cantidad de victimas por años
+```{r}
+anio_real <- victimas_parque %>%
+  group_by(fecha_de_secuestro) %>% 
+  mutate(fecha = dmy(fecha_de_secuestro)) %>% 
+  mutate(anio = year(fecha)) %>% 
+  group_by(anio) %>% 
+  filter(!is.na(anio)) %>% 
+  summarise(victimas_por_anio = n()) %>% 
+  arrange(desc(victimas_por_anio))
+```
+
+```{r}
+anio_monumento <- victimas_parque %>% 
+  group_by(ano_en_monumento) %>% 
+  mutate(anio = as.numeric(ano_en_monumento)) %>% 
+  group_by(anio) %>% 
+  summarise(victimas_por_anio = n()) %>% 
+  arrange(desc(victimas_por_anio)) 
+```
+Comparación de cantidad de victimas por año con fecha de secuestro y por año con anio en monumeto
+```{r}
+anio_real %>% 
+  left_join(anio_monumento, by = "anio", suffix = c(".anio", ".anio_en_monumento")) 
+```
+
+```{r}
+victimas_parque %>% 
+  group_by(ocupaciones) %>% 
+  filter(!is.na(ocupaciones)) %>% 
+  summarise(proporcion_ocupacion = n()/nrow(.)) %>% 
+  arrange(desc(proporcion_ocupacion)) %>% 
+  mutate(proporcion_ocupacion = scales::percent(proporcion_ocupacion)) 
+```
 
