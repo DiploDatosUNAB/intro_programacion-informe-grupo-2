@@ -1,6 +1,6 @@
 ---
 title: "Presentes"
-author: "Alberto Fernandez y Clara Bonpland Mignaquy"
+author: "Alberto Sabá Fernandez Robles y Clara Bonpland Mignaquy"
 output:
   html_document:
     code_folding: hide
@@ -200,6 +200,50 @@ militancias <- unnest(victimas_parque, militancia) %>%
   summarise(cant_por_militancia = n()) %>% 
   arrange(desc(cant_por_militancia)) 
 ```
+```{r}
+militancia_sindical <- militancias %>% 
+  group_by(edad, fecha_de_secuestro, orga1, orga2, orga3, orga4) %>% 
+  summarise(cant_por_militancia = n()) %>% 
+  arrange(desc(cant_por_militancia))
+```
+
+```{r}
+filtro_ms <- militancia_sindical %>% 
+  group_by(fecha_de_secuestro) %>% 
+  mutate(fecha = dmy(fecha_de_secuestro)) %>% 
+  mutate(anio = year(fecha)) %>% 
+  group_by(edad, anio, orga1) %>% 
+  summarise(cant_por_militancia = n()) %>% 
+  arrange(desc(cant_por_militancia)) %>% 
+  mutate(sindicato = case_when(
+  stringr::str_detect(orga1, "Sind") ~ "sindicalista",
+  stringr::str_detect(orga1, "Delega") ~ "sindicalista",
+  stringr::str_detect(orga1, "ATE") ~ "sindicalista",
+  stringr::str_detect(orga1, "UOCRA") ~ "sindicalista",
+  stringr::str_detect(orga1, "obrer") ~ "sindicalista",
+  stringr::str_detect(orga1, "trab") ~ "sindicalista",
+  stringr::str_detect(orga1, "UOM") ~ "sindicalista",
+  stringr::str_detect(orga1, "cgt") ~ "sindicalista",
+  stringr::str_detect(orga1, "uta") ~ "sindicalista",
+  stringr::str_detect(orga1, "upcn") ~ "sindicalista",
+  stringr::str_detect(orga1, "grem") ~ "sindicalista"))
+```
+
+```{r}
+filtro_ms %>% 
+  filter(anio %in% c(1976:1982)) %>% 
+  group_by(anio, orga1, sindicato) %>% 
+  filter(sindicato == "sindicalista") %>% 
+  summarise(n = n()) %>% 
+  mutate(prop = n/sum(n))
+```
+```{r}
+filtro_ms %>% 
+  filter(anio %in% c(1976:1982)) %>% 
+  group_by(sindicato) %>% 
+  filter(sindicato == "sindicalista") %>% 
+  summarise(n = n())
+```
 
 Exploramos la cantidad de víctimas por espacio de militancia y año.
 
@@ -281,6 +325,28 @@ victimas_parque %>%
   rename("Lugar de secuestro" = lugar_de_secuestro, "Víctimas" = cantidad_lugar, "Espacio de miitancia" = militancia)
 ```
 
+```{r}
+victimas_parque %>% 
+  mutate(edad = as.numeric(edad)) %>% 
+  summarise(edad_max = max(edad, na.rm = TRUE), 
+            edad_min = min(edad, na.rm = TRUE), 
+            edad_media = mean(edad, na.rm = TRUE),
+            edad_sd = sd(edad, na.rm = TRUE)) %>% 
+  rename("Edad máxima" = edad_max, 
+         "Edad mínima" = edad_min, 
+         "Edad media" = edad_media, 
+         "Desviación estándar" = edad_sd)
+```
+
+```{r}
+victimas_parque %>% 
+  group_by(edad = as.numeric(edad)) %>% 
+  summarise(cantidad = n()) %>% 
+  arrange(desc(cantidad)) %>% 
+  ggplot(aes(edad, cantidad)) + 
+  geom_col()
+```
+
 Para profundizar el análisis, decidimos incorporar el dataframe victimas_denuncia.
 
 Selección de variables:
@@ -307,7 +373,6 @@ victimas_denuncia %>%
   arrange(desc(cantidad)) %>% 
   ggplot(aes(edad_al_momento_del_hecho_numerico, cantidad)) + 
   geom_col()
-  
 ```
 
 Buscamos el promedio, el valor máximo, el valor mínimo y el desvío estándar de la edad.
@@ -323,6 +388,8 @@ victimas_denuncia %>%
          "Edad media" = edad_media, 
          "Desviación estándar" = edad_sd)
 ```
+
+
 
 ## Hipótesis
 
