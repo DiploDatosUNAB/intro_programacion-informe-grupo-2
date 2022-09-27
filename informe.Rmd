@@ -217,15 +217,20 @@ filtro_ms <- militancia_sindical %>%
   arrange(desc(cant_por_militancia)) %>% 
   mutate(sindicato = case_when(
   stringr::str_detect(orga1, "Sind") ~ "sindicalista",
+  stringr::str_detect(orga1, "sind") ~ "sindicalista",
   stringr::str_detect(orga1, "Delega") ~ "sindicalista",
+  stringr::str_detect(orga1, "delega") ~ "sindicalista",
   stringr::str_detect(orga1, "ATE") ~ "sindicalista",
   stringr::str_detect(orga1, "UOCRA") ~ "sindicalista",
+  stringr::str_detect(orga1, "Obrer") ~ "sindicalista",
   stringr::str_detect(orga1, "obrer") ~ "sindicalista",
+  stringr::str_detect(orga1, "Trab") ~ "sindicalista",
   stringr::str_detect(orga1, "trab") ~ "sindicalista",
   stringr::str_detect(orga1, "UOM") ~ "sindicalista",
-  stringr::str_detect(orga1, "cgt") ~ "sindicalista",
-  stringr::str_detect(orga1, "uta") ~ "sindicalista",
-  stringr::str_detect(orga1, "upcn") ~ "sindicalista",
+  stringr::str_detect(orga1, "CGT") ~ "sindicalista",
+  stringr::str_detect(orga1, "UTA") ~ "sindicalista",
+  stringr::str_detect(orga1, "UPCN") ~ "sindicalista",
+  stringr::str_detect(orga1, "Grem") ~ "sindicalista",
   stringr::str_detect(orga1, "grem") ~ "sindicalista"))
 ```
 
@@ -488,7 +493,15 @@ victimas_76_82 <- victimas_parque %>%
   
 ```
 
-Filtro Victimas del 78 al 82, agrupando por su edad y año.
+
+
+```{r}
+victimas_76_82 %>% 
+  group_by(anio) %>% 
+  summarise(cantidad_victimas = n()) %>% 
+  summarise(sum(cantidad_victimas))
+```
+Filtro Victimas del 76 al 82, agrupando por su edad y año.
 
 ```{r}
 victimas_76_82 %>% 
@@ -585,20 +598,25 @@ filtro_lugar <- militancia_lugar_secuestro %>%
   group_by(fecha_de_secuestro) %>% 
   mutate(fecha = dmy(fecha_de_secuestro)) %>% 
   mutate(anio = year(fecha)) %>% 
-  group_by(edad, anio, orga1, lugar_de_secuestro) %>% 
+  group_by( anio, orga1, lugar_de_secuestro) %>% 
   summarise(cant_por_militancia = n()) %>% 
   arrange(desc(cant_por_militancia)) %>% 
   mutate(sindicato = case_when(
   stringr::str_detect(orga1, "Sind") ~ "sindicalista",
+  stringr::str_detect(orga1, "sind") ~ "sindicalista",
   stringr::str_detect(orga1, "Delega") ~ "sindicalista",
+  stringr::str_detect(orga1, "delega") ~ "sindicalista",
   stringr::str_detect(orga1, "ATE") ~ "sindicalista",
   stringr::str_detect(orga1, "UOCRA") ~ "sindicalista",
+  stringr::str_detect(orga1, "Obrer") ~ "sindicalista",
   stringr::str_detect(orga1, "obrer") ~ "sindicalista",
+  stringr::str_detect(orga1, "Trab") ~ "sindicalista",
   stringr::str_detect(orga1, "trab") ~ "sindicalista",
   stringr::str_detect(orga1, "UOM") ~ "sindicalista",
-  stringr::str_detect(orga1, "cgt") ~ "sindicalista",
-  stringr::str_detect(orga1, "uta") ~ "sindicalista",
-  stringr::str_detect(orga1, "upcn") ~ "sindicalista",
+  stringr::str_detect(orga1, "CGT") ~ "sindicalista",
+  stringr::str_detect(orga1, "UTA") ~ "sindicalista",
+  stringr::str_detect(orga1, "UPCN") ~ "sindicalista",
+  stringr::str_detect(orga1, "Grem") ~ "sindicalista",
   stringr::str_detect(orga1, "grem") ~ "sindicalista"))
 ```
 ```{r}
