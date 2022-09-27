@@ -283,8 +283,12 @@ También queremos conocer los lugares en que ocurrieron los secuestros o detenci
 
 ```{r}
 victimas_parque %>% 
+  group_by(fecha_de_secuestro) %>% 
+  mutate(fecha = dmy(fecha_de_secuestro)) %>% 
+  mutate(anio = year(fecha)) %>% 
+  filter(anio %in% c(1976:1982)) %>% 
+  group_by(lugar_de_secuestro) %>% 
   filter(!is.na(lugar_de_secuestro)) %>% 
-  group_by(lugar_de_secuestro) %>%
   summarise(cantidad_lugar = n()) %>% 
   arrange(desc(cantidad_lugar)) %>% 
   rename("Lugar de secuestro" = lugar_de_secuestro, "Víctimas" = cantidad_lugar)
@@ -294,6 +298,10 @@ Cruzamos los lugares de secuestro con las ocupaciones y la edad de las víctimas
 
 ```{r}
 victimas_parque %>% 
+  group_by(fecha_de_secuestro) %>% 
+  mutate(fecha = dmy(fecha_de_secuestro)) %>% 
+  mutate(anio = year(fecha)) %>% 
+  filter(anio %in% c(1976:1982)) %>%
   filter(!is.na(lugar_de_secuestro)) %>% 
   group_by(lugar_de_secuestro, ocupaciones, edad) %>%
   summarise(cantidad_lugar = n()) %>% 
@@ -301,28 +309,54 @@ victimas_parque %>%
   rename("Lugar de secuestro" = lugar_de_secuestro, "Ocupaciones" = ocupaciones, "Edad" = edad, "Víctimas" = cantidad_lugar)
 ```
 
-Resulta interesante que la ciudad de Mar de Plata se encuentra en 6° lugar de la tabla, por lo que buscamos las ocupaciones de las víctimas en el lugar. #Estaría bueno aclarar por qué consideran sorprentende ver a Mar del Plata en el 6to lugar. ¿Es porque es una ciudad relativamente chica? (San Miguel de Tucumán tiene actualmente una población similar a Mar del Plata y aparece 4ta. aunque una comparación más correcta sería con la población de esa época.)
+Resulta interesante que la ciudad de Mar de Plata se encuentra en 6° lugar de la tabla, por lo que buscamos las ocupaciones de las víctimas en el lugar. 
+De acuerdo a lo que vneimos explorando, nos resulta signifitiva la variable identitaria de estudiante. Cuando exploramos los lugares de secuestro, pensamos en las ciudades como universitarias. Nos llama la atencion que Mar del Plata esté en el sexto lugar de mayor cantidad de victimas, porque no consideramos que sea una ciudad universitari. Buscamos qué ocupaciones tienen las víctimas. 
+#Estaria bueno profundizar Tucuman
+
+#Estaría bueno aclarar por qué consideran sorprentende ver a Mar del Plata en el 6to lugar. ¿Es porque es una ciudad relativamente chica? (San Miguel de Tucumán tiene actualmente una población similar a Mar del Plata y aparece 4ta. aunque una comparación más correcta sería con la población de esa época.)
 
 ```{r}
 victimas_parque %>% 
+  group_by(fecha_de_secuestro) %>% 
+  mutate(fecha = dmy(fecha_de_secuestro)) %>% 
+  mutate(anio = year(fecha)) %>% 
+  filter(anio %in% c(1976:1982)) %>%
   filter(!is.na(lugar_de_secuestro)) %>% 
   group_by(lugar_de_secuestro, ocupaciones) %>%
   filter(lugar_de_secuestro == "MAR DEL PLATA. BS. AS.") %>% 
   summarise(cantidad_lugar = n()) %>% 
   arrange(desc(cantidad_lugar)) %>% 
-  rename("Lugar de secuestro" = lugar_de_secuestro, "Ocupaciones" = ocupaciones, "Víctimas" = cantidad_lugar)
+  rename("Lugar de secuestro" = lugar_de_secuestro, "Ocupaciones" = ocupaciones, "Víctimas" = cantidad_lugar) 
+  
 ```
-
-Como el resto de las ciudades son universitarias, decidimos filtrar por espacios de militancia.
 
 ```{r}
 victimas_parque %>% 
+  group_by(fecha_de_secuestro) %>% 
+  mutate(fecha = dmy(fecha_de_secuestro)) %>% 
+  mutate(anio = year(fecha)) %>% 
+  filter(anio %in% c(1976:1982)) %>%
   filter(!is.na(lugar_de_secuestro)) %>% 
-  group_by(lugar_de_secuestro, militancia = as.character(militancia)) %>%
+  group_by(lugar_de_secuestro, ocupaciones) %>%
   filter(lugar_de_secuestro == "MAR DEL PLATA. BS. AS.") %>% 
+  filter(ocupaciones %in% c("Estudiante Universitario", "Estudiante Universitaria", "Estudiante", "Estudiante Secundario")) %>% 
   summarise(cantidad_lugar = n()) %>% 
-  arrange(desc(cantidad_lugar)) %>% 
-  rename("Lugar de secuestro" = lugar_de_secuestro, "Víctimas" = cantidad_lugar, "Espacio de miitancia" = militancia)
+  arrange(desc(cantidad_lugar)) 
+```
+
+Como no nos parece significativa la cantidad de victimas estudiantes, decidimos buscar los espacios de militancia de las victimas.
+Como el resto de las ciudades son universitarias, decidimos filtrar por espacios de militancia.
+
+
+```{r}
+militancias %>% 
+  group_by(lugar_de_secuestro, orga1) %>% 
+  filter(lugar_de_secuestro == "MAR DEL PLATA. BS. AS.") %>% 
+  summarise(cant_por_militancia = n()) %>% 
+  arrange(desc(cant_por_militancia)) %>% 
+  head(5) %>% 
+  ggplot(aes(orga1, cant_por_militancia)) +
+  geom_col()
 ```
 
 ```{r}
@@ -525,60 +559,80 @@ variable identitaria más repetida y su relación con el lugar del hecho y el a�
 
 ```
 
-DESARMANDO LA TABLA DE MILITANCIA
 
+##Conclusión: decidir que hacer con el grafico
+
+Lugar de secuestro con espacio de militancia - mar del plata
 ```{r}
-militancias <- victimas_parque %>% 
-  tidyr::unnest(militancia) %>% 
-  select(id, ocupaciones, lugar_de_secuestro, listado)
-
-militancias
-
-
+militancias %>% 
+  group_by(lugar_de_secuestro, orga1) %>% 
+  filter(lugar_de_secuestro == "MAR DEL PLATA. BS. AS.") %>% 
+  summarise(cant_por_militancia = n()) %>% 
+  arrange(desc(cant_por_militancia)) %>% 
+  head(5) %>% 
+  ggplot(aes(orga1, cant_por_militancia)) +
+  geom_col()
 ```
 
 ```{r}
-militancias %>% 
-  filter(ocupaciones %in% c("Estudiante Universitario", "Estudiante Universitaria", "Estudiante", "Estudiante Secundario")) %>% 
-  group_by(ocupaciones, listado) %>% 
-  summarise(cantidad = n()) %>% 
-  arrange(desc(cantidad))
+militancia_lugar_secuestro <- militancias %>% 
+  group_by(edad, fecha_de_secuestro, orga1, orga2, orga3, orga4, lugar_de_secuestro) %>% 
+  summarise(cant_por_militancia = n()) %>% 
+  arrange(desc(cant_por_militancia))
 ```
-
 ```{r}
-militancias %>% 
-  group_by(id) %>% 
-  summarise(cantidad = n()) %>% 
-  filter(cantidad == 1)
+filtro_lugar <- militancia_lugar_secuestro %>% 
+  group_by(fecha_de_secuestro) %>% 
+  mutate(fecha = dmy(fecha_de_secuestro)) %>% 
+  mutate(anio = year(fecha)) %>% 
+  group_by(edad, anio, orga1, lugar_de_secuestro) %>% 
+  summarise(cant_por_militancia = n()) %>% 
+  arrange(desc(cant_por_militancia)) %>% 
+  mutate(sindicato = case_when(
+  stringr::str_detect(orga1, "Sind") ~ "sindicalista",
+  stringr::str_detect(orga1, "Delega") ~ "sindicalista",
+  stringr::str_detect(orga1, "ATE") ~ "sindicalista",
+  stringr::str_detect(orga1, "UOCRA") ~ "sindicalista",
+  stringr::str_detect(orga1, "obrer") ~ "sindicalista",
+  stringr::str_detect(orga1, "trab") ~ "sindicalista",
+  stringr::str_detect(orga1, "UOM") ~ "sindicalista",
+  stringr::str_detect(orga1, "cgt") ~ "sindicalista",
+  stringr::str_detect(orga1, "uta") ~ "sindicalista",
+  stringr::str_detect(orga1, "upcn") ~ "sindicalista",
+  stringr::str_detect(orga1, "grem") ~ "sindicalista"))
+```
+```{r}
+filtro_lugar %>% 
+  filter(lugar_de_secuestro == "MAR DEL PLATA. BS. AS.") %>% 
+  group_by(lugar_de_secuestro,orga1) %>% 
+  summarise(n = n()) %>% 
+  arrange(desc(n))
   
 ```
 
-victimas con dos espacios de militancia
-
 ```{r}
-militancias %>% 
-  group_by(id, ocupaciones) %>% 
-  summarise(cantidad = n()) %>% 
-  filter(cantidad == 2)
-  
+filtro_lugar %>% 
+  filter(anio %in% c(1976:1982)) %>%
+  filter(lugar_de_secuestro == "MAR DEL PLATA. BS. AS.") %>% 
+  group_by(lugar_de_secuestro, orga1, sindicato) %>% 
+  filter(sindicato == "sindicalista") %>% 
+  summarise(n = n()) %>% 
+  arrange(desc(n))
 ```
 
+Tucuman
 ```{r}
-militancias %>% 
-  group_by(id) %>% 
-  summarise(cantidad = n()) %>% 
-  filter(cantidad == 3)
-  
+filtro_lugar %>% 
+  filter(anio %in% c(1976:1982)) %>%
+  filter(lugar_de_secuestro == "TUCUMAN") %>% 
+  group_by(lugar_de_secuestro, orga1, sindicato) %>% 
+  filter(sindicato == "sindicalista") %>% 
+  summarise(n = n()) %>% 
+  arrange(desc(n))
 ```
 
-```{r}
-militancias %>% 
-  group_by(id, ocupaciones) %>% 
-  summarise(cantidad = n()) %>% 
-  filter(cantidad == 4) 
-  
-  
-```
+
+
 
 probando codigo para comprara cantidad de victimas por años
 
