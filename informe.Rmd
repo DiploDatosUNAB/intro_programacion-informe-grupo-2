@@ -67,7 +67,8 @@ victimas_parque %>%
   group_by(sexo) %>% 
   summarise(cantidad_sexo = n()) %>% 
   arrange(desc(cantidad_sexo)) %>% 
-  rename("Víctimas" = cantidad_sexo, "Sexo" = sexo)
+  rename("Víctimas" = cantidad_sexo, "Sexo" = sexo) %>% 
+  gt::gt()
 ```
 
 Exploración por edad de las victimas.
