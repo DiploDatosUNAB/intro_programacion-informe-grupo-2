@@ -93,10 +93,11 @@ victimas_parque %>%
   summarise(cantidad = n()) %>% 
   arrange(desc(edad)) %>%
   ggplot(aes(edad, cantidad)) + 
-  geom_col(aes(color = sexo)) 
+  geom_col(aes(color = sexo)) +
+  xlab("Edad") + ylab("Cantidad de víctimas")
 ```
 
-Nos interesa incoporar la variable ocupaciones.
+Nos interesa explorar la variable ocupaciones.
 
 ```{r}
 victimas_parque %>% 
