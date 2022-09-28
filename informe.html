@@ -9,7 +9,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
-<meta name="author" content="Alberto Fernandez y Clara Bonpland Mignaquy" />
+<meta name="author" content="Alberto Sabá Fernandez Robles y Clara Bonpland Mignaquy" />
 
 
 <title>Presentes</title>
@@ -451,7 +451,8 @@ pre code {
 
 
 <h1 class="title toc-ignore">Presentes</h1>
-<h4 class="author">Alberto Fernandez y Clara Bonpland Mignaquy</h4>
+<h4 class="author">Alberto Sabá Fernandez Robles y Clara Bonpland
+Mignaquy</h4>
 
 </div>
 
@@ -746,19 +747,19 @@ víctimas.</p>
   arrange(desc(cant_por_militancia)) </code></pre>
 <pre><code>## # A tibble: 413 × 5
 ## # Groups:   orga1, orga2, orga3 [413]
-##    orga1                                      orga2 orga3 orga4 cant_por_milita…
-##    &lt;chr&gt;                                      &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;            &lt;int&gt;
-##  1 Montoneros                                 &lt;NA&gt;  &lt;NA&gt;  &lt;NA&gt;               903
-##  2 Partido Revolucionario de los Trabajadores Ejér… &lt;NA&gt;  &lt;NA&gt;               429
-##  3 Juventud Peronista (JP)                    &lt;NA&gt;  &lt;NA&gt;  &lt;NA&gt;               396
-##  4 Juventud Universitaria Peronista (JUP)     &lt;NA&gt;  &lt;NA&gt;  &lt;NA&gt;               278
-##  5 Militante sindical                         &lt;NA&gt;  &lt;NA&gt;  &lt;NA&gt;               182
-##  6 Partido Comunista Marxista Leninista (PCM… &lt;NA&gt;  &lt;NA&gt;  &lt;NA&gt;               133
-##  7 Partido Revolucionario de los Trabajadore… &lt;NA&gt;  &lt;NA&gt;  &lt;NA&gt;               129
-##  8 Ejército Revolucionario del Pueblo (ERP)   &lt;NA&gt;  &lt;NA&gt;  &lt;NA&gt;               108
-##  9 Partido Comunista (PC)                     &lt;NA&gt;  &lt;NA&gt;  &lt;NA&gt;               105
-## 10 Partido Socialista de los Trabajadores (P… &lt;NA&gt;  &lt;NA&gt;  &lt;NA&gt;                99
-## # … with 403 more rows</code></pre>
+##    orga1                                            orga2    orga3 orga4 cant_…¹
+##    &lt;chr&gt;                                            &lt;chr&gt;    &lt;chr&gt; &lt;chr&gt;   &lt;int&gt;
+##  1 Montoneros                                       &lt;NA&gt;     &lt;NA&gt;  &lt;NA&gt;      903
+##  2 Partido Revolucionario de los Trabajadores       Ejércit… &lt;NA&gt;  &lt;NA&gt;      429
+##  3 Juventud Peronista (JP)                          &lt;NA&gt;     &lt;NA&gt;  &lt;NA&gt;      396
+##  4 Juventud Universitaria Peronista (JUP)           &lt;NA&gt;     &lt;NA&gt;  &lt;NA&gt;      278
+##  5 Militante sindical                               &lt;NA&gt;     &lt;NA&gt;  &lt;NA&gt;      182
+##  6 Partido Comunista Marxista Leninista (PCML)      &lt;NA&gt;     &lt;NA&gt;  &lt;NA&gt;      133
+##  7 Partido Revolucionario de los Trabajadores (PRT) &lt;NA&gt;     &lt;NA&gt;  &lt;NA&gt;      129
+##  8 Ejército Revolucionario del Pueblo (ERP)         &lt;NA&gt;     &lt;NA&gt;  &lt;NA&gt;      108
+##  9 Partido Comunista (PC)                           &lt;NA&gt;     &lt;NA&gt;  &lt;NA&gt;      105
+## 10 Partido Socialista de los Trabajadores (PST)     &lt;NA&gt;     &lt;NA&gt;  &lt;NA&gt;       99
+## # … with 403 more rows, and abbreviated variable name ¹​cant_por_militancia</code></pre>
 <pre class="r"><code>militancia_sindical &lt;- militancias %&gt;% 
   group_by(edad, fecha_de_secuestro, orga1, orga2, orga3, orga4) %&gt;% 
   summarise(cant_por_militancia = n()) %&gt;% 
@@ -772,15 +773,20 @@ víctimas.</p>
   arrange(desc(cant_por_militancia)) %&gt;% 
   mutate(sindicato = case_when(
   stringr::str_detect(orga1, &quot;Sind&quot;) ~ &quot;sindicalista&quot;,
+  stringr::str_detect(orga1, &quot;sind&quot;) ~ &quot;sindicalista&quot;,
   stringr::str_detect(orga1, &quot;Delega&quot;) ~ &quot;sindicalista&quot;,
+  stringr::str_detect(orga1, &quot;delega&quot;) ~ &quot;sindicalista&quot;,
   stringr::str_detect(orga1, &quot;ATE&quot;) ~ &quot;sindicalista&quot;,
   stringr::str_detect(orga1, &quot;UOCRA&quot;) ~ &quot;sindicalista&quot;,
+  stringr::str_detect(orga1, &quot;Obrer&quot;) ~ &quot;sindicalista&quot;,
   stringr::str_detect(orga1, &quot;obrer&quot;) ~ &quot;sindicalista&quot;,
+  stringr::str_detect(orga1, &quot;Trab&quot;) ~ &quot;sindicalista&quot;,
   stringr::str_detect(orga1, &quot;trab&quot;) ~ &quot;sindicalista&quot;,
   stringr::str_detect(orga1, &quot;UOM&quot;) ~ &quot;sindicalista&quot;,
-  stringr::str_detect(orga1, &quot;cgt&quot;) ~ &quot;sindicalista&quot;,
-  stringr::str_detect(orga1, &quot;uta&quot;) ~ &quot;sindicalista&quot;,
-  stringr::str_detect(orga1, &quot;upcn&quot;) ~ &quot;sindicalista&quot;,
+  stringr::str_detect(orga1, &quot;CGT&quot;) ~ &quot;sindicalista&quot;,
+  stringr::str_detect(orga1, &quot;UTA&quot;) ~ &quot;sindicalista&quot;,
+  stringr::str_detect(orga1, &quot;UPCN&quot;) ~ &quot;sindicalista&quot;,
+  stringr::str_detect(orga1, &quot;Grem&quot;) ~ &quot;sindicalista&quot;,
   stringr::str_detect(orga1, &quot;grem&quot;) ~ &quot;sindicalista&quot;))</code></pre>
 <pre class="r"><code>filtro_ms %&gt;% 
   filter(anio %in% c(1976:1982)) %&gt;% 
@@ -788,21 +794,21 @@ víctimas.</p>
   filter(sindicato == &quot;sindicalista&quot;) %&gt;% 
   summarise(n = n()) %&gt;% 
   mutate(prop = n/sum(n))</code></pre>
-<pre><code>## # A tibble: 130 × 5
-## # Groups:   anio, orga1 [130]
-##     anio orga1                                             sindicato     n  prop
-##    &lt;dbl&gt; &lt;chr&gt;                                             &lt;chr&gt;     &lt;int&gt; &lt;dbl&gt;
-##  1  1976 Acción Sindical Argentina (ASA)                   sindical…     3     1
-##  2  1976 Activista Sindical                                sindical…     1     1
-##  3  1976 Asociacion Tecnicos y Empleados de Proteccion y … sindical…     1     1
-##  4  1976 Asociación Trabajadores del Estado (ATE)          sindical…     2     1
-##  5  1976 Delegada De Obras Sanitarias, Cba.                sindical…     1     1
-##  6  1976 Delegada Docente, Pc                              sindical…     1     1
-##  7  1976 Delegada Escuela Técnica Industrial De Cba        sindical…     1     1
-##  8  1976 Delegada Estudiantil                              sindical…     1     1
-##  9  1976 Delegada Gremial De La Unión De Educadores        sindical…     1     1
-## 10  1976 Delegado Bancario                                 sindical…     1     1
-## # … with 120 more rows</code></pre>
+<pre><code>## # A tibble: 204 × 5
+## # Groups:   anio, orga1 [204]
+##     anio orga1                                               sindi…¹     n  prop
+##    &lt;dbl&gt; &lt;chr&gt;                                               &lt;chr&gt;   &lt;int&gt; &lt;dbl&gt;
+##  1  1976 Acción Sindical Argentina (ASA)                     sindic…     3     1
+##  2  1976 Act Gremial Udba                                    sindic…     1     1
+##  3  1976 Activista Gremial En Ingenio Consepción             sindic…     1     1
+##  4  1976 Activista Sindical                                  sindic…     1     1
+##  5  1976 Adep, Militante Gremial.                            sindic…     1     1
+##  6  1976 Agrup Gremial Peronista                             sindic…     1     1
+##  7  1976 Asociación de Trabajadores de la Universidad Nacio… sindic…     2     1
+##  8  1976 Asociacion Tecnicos y Empleados de Proteccion y Se… sindic…     1     1
+##  9  1976 Asociación Trabajadores del Estado (ATE)            sindic…     2     1
+## 10  1976 Confederación de Trabajadores de la Educación de l… sindic…     6     1
+## # … with 194 more rows, and abbreviated variable name ¹​sindicato</code></pre>
 <pre class="r"><code>filtro_ms %&gt;% 
   filter(anio %in% c(1976:1982)) %&gt;% 
   group_by(sindicato) %&gt;% 
@@ -811,7 +817,7 @@ víctimas.</p>
 <pre><code>## # A tibble: 1 × 2
 ##   sindicato        n
 ##   &lt;chr&gt;        &lt;int&gt;
-## 1 sindicalista   159</code></pre>
+## 1 sindicalista   527</code></pre>
 <p>Exploramos la cantidad de víctimas por espacio de militancia y
 año.</p>
 <pre class="r"><code>militancias %&gt;%  
@@ -822,19 +828,19 @@ año.</p>
   arrange(desc(cant_por_militancia)) </code></pre>
 <pre><code>## # A tibble: 655 × 6
 ## # Groups:   anio, orga1, orga2, orga3 [655]
-##     anio orga1                                orga2 orga3 orga4 cant_por_milita…
-##    &lt;dbl&gt; &lt;chr&gt;                                &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;            &lt;int&gt;
-##  1  1977 Montoneros                           &lt;NA&gt;  &lt;NA&gt;  &lt;NA&gt;               322
-##  2  1976 Montoneros                           &lt;NA&gt;  &lt;NA&gt;  &lt;NA&gt;               220
-##  3    NA Montoneros                           &lt;NA&gt;  &lt;NA&gt;  &lt;NA&gt;               208
-##  4  1976 Partido Revolucionario de los Traba… Ejér… &lt;NA&gt;  &lt;NA&gt;               171
-##  5  1976 Juventud Peronista (JP)              &lt;NA&gt;  &lt;NA&gt;  &lt;NA&gt;               154
-##  6  1977 Juventud Peronista (JP)              &lt;NA&gt;  &lt;NA&gt;  &lt;NA&gt;               147
-##  7  1977 Juventud Universitaria Peronista (J… &lt;NA&gt;  &lt;NA&gt;  &lt;NA&gt;               123
-##  8    NA Partido Revolucionario de los Traba… Ejér… &lt;NA&gt;  &lt;NA&gt;               119
-##  9  1976 Militante sindical                   &lt;NA&gt;  &lt;NA&gt;  &lt;NA&gt;                87
-## 10  1978 Montoneros                           &lt;NA&gt;  &lt;NA&gt;  &lt;NA&gt;                80
-## # … with 645 more rows</code></pre>
+##     anio orga1                                      orga2    orga3 orga4 cant_…¹
+##    &lt;dbl&gt; &lt;chr&gt;                                      &lt;chr&gt;    &lt;chr&gt; &lt;chr&gt;   &lt;int&gt;
+##  1  1977 Montoneros                                 &lt;NA&gt;     &lt;NA&gt;  &lt;NA&gt;      322
+##  2  1976 Montoneros                                 &lt;NA&gt;     &lt;NA&gt;  &lt;NA&gt;      220
+##  3    NA Montoneros                                 &lt;NA&gt;     &lt;NA&gt;  &lt;NA&gt;      208
+##  4  1976 Partido Revolucionario de los Trabajadores Ejércit… &lt;NA&gt;  &lt;NA&gt;      171
+##  5  1976 Juventud Peronista (JP)                    &lt;NA&gt;     &lt;NA&gt;  &lt;NA&gt;      154
+##  6  1977 Juventud Peronista (JP)                    &lt;NA&gt;     &lt;NA&gt;  &lt;NA&gt;      147
+##  7  1977 Juventud Universitaria Peronista (JUP)     &lt;NA&gt;     &lt;NA&gt;  &lt;NA&gt;      123
+##  8    NA Partido Revolucionario de los Trabajadores Ejércit… &lt;NA&gt;  &lt;NA&gt;      119
+##  9  1976 Militante sindical                         &lt;NA&gt;     &lt;NA&gt;  &lt;NA&gt;       87
+## 10  1978 Montoneros                                 &lt;NA&gt;     &lt;NA&gt;  &lt;NA&gt;       80
+## # … with 645 more rows, and abbreviated variable name ¹​cant_por_militancia</code></pre>
 <p>Cruzamos la cantidad de víctimas por espacios de militancia y sus
 ocupaciones.</p>
 <pre class="r"><code>militancias %&gt;%  
@@ -845,19 +851,19 @@ ocupaciones.</p>
   arrange(desc(cant_por_militancia)) </code></pre>
 <pre><code>## # A tibble: 2,568 × 6
 ## # Groups:   ocupaciones, orga1, orga2, orga3 [2,568]
-##    ocupaciones              orga1             orga2 orga3 orga4 cant_por_milita…
-##    &lt;chr&gt;                    &lt;chr&gt;             &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;            &lt;int&gt;
-##  1 &lt;NA&gt;                     Montoneros        &lt;NA&gt;  &lt;NA&gt;  &lt;NA&gt;               275
-##  2 &lt;NA&gt;                     Partido Revoluci… Ejér… &lt;NA&gt;  &lt;NA&gt;               151
-##  3 Estudiante Universitario Juventud Univers… &lt;NA&gt;  &lt;NA&gt;  &lt;NA&gt;                90
-##  4 &lt;NA&gt;                     Juventud Peronis… &lt;NA&gt;  &lt;NA&gt;  &lt;NA&gt;                88
-##  5 Estudiante Universitario Montoneros        &lt;NA&gt;  &lt;NA&gt;  &lt;NA&gt;                78
-##  6 Estudiante Universitaria Montoneros        &lt;NA&gt;  &lt;NA&gt;  &lt;NA&gt;                73
-##  7 Estudiante Universitaria Juventud Univers… &lt;NA&gt;  &lt;NA&gt;  &lt;NA&gt;                43
-##  8 &lt;NA&gt;                     Ejército Revoluc… &lt;NA&gt;  &lt;NA&gt;  &lt;NA&gt;                37
-##  9 Estudiante Universitaria Partido Revoluci… Ejér… &lt;NA&gt;  &lt;NA&gt;                35
-## 10 Estudiante Universitario Juventud Peronis… &lt;NA&gt;  &lt;NA&gt;  &lt;NA&gt;                31
-## # … with 2,558 more rows</code></pre>
+##    ocupaciones              orga1                      orga2 orga3 orga4 cant_…¹
+##    &lt;chr&gt;                    &lt;chr&gt;                      &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;   &lt;int&gt;
+##  1 &lt;NA&gt;                     Montoneros                 &lt;NA&gt;  &lt;NA&gt;  &lt;NA&gt;      275
+##  2 &lt;NA&gt;                     Partido Revolucionario de… Ejér… &lt;NA&gt;  &lt;NA&gt;      151
+##  3 Estudiante Universitario Juventud Universitaria Pe… &lt;NA&gt;  &lt;NA&gt;  &lt;NA&gt;       90
+##  4 &lt;NA&gt;                     Juventud Peronista (JP)    &lt;NA&gt;  &lt;NA&gt;  &lt;NA&gt;       88
+##  5 Estudiante Universitario Montoneros                 &lt;NA&gt;  &lt;NA&gt;  &lt;NA&gt;       78
+##  6 Estudiante Universitaria Montoneros                 &lt;NA&gt;  &lt;NA&gt;  &lt;NA&gt;       73
+##  7 Estudiante Universitaria Juventud Universitaria Pe… &lt;NA&gt;  &lt;NA&gt;  &lt;NA&gt;       43
+##  8 &lt;NA&gt;                     Ejército Revolucionario d… &lt;NA&gt;  &lt;NA&gt;  &lt;NA&gt;       37
+##  9 Estudiante Universitaria Partido Revolucionario de… Ejér… &lt;NA&gt;  &lt;NA&gt;       35
+## 10 Estudiante Universitario Juventud Peronista (JP)    &lt;NA&gt;  &lt;NA&gt;  &lt;NA&gt;       31
+## # … with 2,558 more rows, and abbreviated variable name ¹​cant_por_militancia</code></pre>
 <p>Buscamos cuáles son los espacios de militancia para la ocupación de
 Estudiantes.</p>
 <pre class="r"><code>militancias %&gt;% 
@@ -869,83 +875,102 @@ Estudiantes.</p>
   arrange(desc(cant_por_militancia))</code></pre>
 <pre><code>## # A tibble: 124 × 6
 ## # Groups:   ocupaciones, orga1, orga2, orga3 [124]
-##    ocupaciones              orga1             orga2 orga3 orga4 cant_por_milita…
-##    &lt;chr&gt;                    &lt;chr&gt;             &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;            &lt;int&gt;
-##  1 Estudiante Universitario Juventud Univers… &lt;NA&gt;  &lt;NA&gt;  &lt;NA&gt;                90
-##  2 Estudiante Universitario Montoneros        &lt;NA&gt;  &lt;NA&gt;  &lt;NA&gt;                78
-##  3 Estudiante Universitaria Montoneros        &lt;NA&gt;  &lt;NA&gt;  &lt;NA&gt;                73
-##  4 Estudiante Universitaria Juventud Univers… &lt;NA&gt;  &lt;NA&gt;  &lt;NA&gt;                43
-##  5 Estudiante Universitaria Partido Revoluci… Ejér… &lt;NA&gt;  &lt;NA&gt;                35
-##  6 Estudiante Universitario Juventud Peronis… &lt;NA&gt;  &lt;NA&gt;  &lt;NA&gt;                31
-##  7 Estudiante Secundario    Unión de Estudia… &lt;NA&gt;  &lt;NA&gt;  &lt;NA&gt;                24
-##  8 Estudiante Universitario Partido Revoluci… Ejér… &lt;NA&gt;  &lt;NA&gt;                23
-##  9 Estudiante               Montoneros        &lt;NA&gt;  &lt;NA&gt;  &lt;NA&gt;                14
-## 10 Estudiante Universitario Federación Juven… &lt;NA&gt;  &lt;NA&gt;  &lt;NA&gt;                13
-## # … with 114 more rows</code></pre>
+##    ocupaciones              orga1                      orga2 orga3 orga4 cant_…¹
+##    &lt;chr&gt;                    &lt;chr&gt;                      &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;   &lt;int&gt;
+##  1 Estudiante Universitario Juventud Universitaria Pe… &lt;NA&gt;  &lt;NA&gt;  &lt;NA&gt;       90
+##  2 Estudiante Universitario Montoneros                 &lt;NA&gt;  &lt;NA&gt;  &lt;NA&gt;       78
+##  3 Estudiante Universitaria Montoneros                 &lt;NA&gt;  &lt;NA&gt;  &lt;NA&gt;       73
+##  4 Estudiante Universitaria Juventud Universitaria Pe… &lt;NA&gt;  &lt;NA&gt;  &lt;NA&gt;       43
+##  5 Estudiante Universitaria Partido Revolucionario de… Ejér… &lt;NA&gt;  &lt;NA&gt;       35
+##  6 Estudiante Universitario Juventud Peronista (JP)    &lt;NA&gt;  &lt;NA&gt;  &lt;NA&gt;       31
+##  7 Estudiante Secundario    Unión de Estudiantes Secu… &lt;NA&gt;  &lt;NA&gt;  &lt;NA&gt;       24
+##  8 Estudiante Universitario Partido Revolucionario de… Ejér… &lt;NA&gt;  &lt;NA&gt;       23
+##  9 Estudiante               Montoneros                 &lt;NA&gt;  &lt;NA&gt;  &lt;NA&gt;       14
+## 10 Estudiante Universitario Federación Juvenil Comuni… &lt;NA&gt;  &lt;NA&gt;  &lt;NA&gt;       13
+## # … with 114 more rows, and abbreviated variable name ¹​cant_por_militancia</code></pre>
 <p>También queremos conocer los lugares en que ocurrieron los secuestros
 o detenciones de las víctimas.</p>
 <pre class="r"><code>victimas_parque %&gt;% 
+  group_by(fecha_de_secuestro) %&gt;% 
+  mutate(fecha = dmy(fecha_de_secuestro)) %&gt;% 
+  mutate(anio = year(fecha)) %&gt;% 
+  filter(anio %in% c(1976:1982)) %&gt;% 
+  group_by(lugar_de_secuestro) %&gt;% 
   filter(!is.na(lugar_de_secuestro)) %&gt;% 
-  group_by(lugar_de_secuestro) %&gt;%
   summarise(cantidad_lugar = n()) %&gt;% 
   arrange(desc(cantidad_lugar)) %&gt;% 
   rename(&quot;Lugar de secuestro&quot; = lugar_de_secuestro, &quot;Víctimas&quot; = cantidad_lugar)</code></pre>
-<pre><code>## # A tibble: 1,412 × 2
+<pre><code>## # A tibble: 1,348 × 2
 ##    `Lugar de secuestro`   Víctimas
 ##    &lt;chr&gt;                     &lt;int&gt;
-##  1 CAPITAL FEDERAL            1350
-##  2 LA PLATA. BS. AS.           429
-##  3 CORDOBA CAPITAL             302
-##  4 SAN MIGUEL DE TUCUMAN       242
-##  5 ROSARIO. SANTA FE           196
-##  6 MAR DEL PLATA. BS. AS.      182
-##  7 BUENOS AIRES                155
-##  8 CORDOBA                     136
+##  1 CAPITAL FEDERAL            1302
+##  2 LA PLATA. BS. AS.           424
+##  3 CORDOBA CAPITAL             288
+##  4 SAN MIGUEL DE TUCUMAN       194
+##  5 ROSARIO. SANTA FE           186
+##  6 MAR DEL PLATA. BS. AS.      181
+##  7 BUENOS AIRES                148
+##  8 CORDOBA                     120
 ##  9 LANUS. BS. AS.               65
-## 10 SE DESCONOCE                 63
-## # … with 1,402 more rows</code></pre>
+## 10 AVELLANEDA. BS. AS.          55
+## # … with 1,338 more rows</code></pre>
 <p>Cruzamos los lugares de secuestro con las ocupaciones y la edad de
 las víctimas.</p>
 <pre class="r"><code>victimas_parque %&gt;% 
+  group_by(fecha_de_secuestro) %&gt;% 
+  mutate(fecha = dmy(fecha_de_secuestro)) %&gt;% 
+  mutate(anio = year(fecha)) %&gt;% 
+  filter(anio %in% c(1976:1982)) %&gt;%
   filter(!is.na(lugar_de_secuestro)) %&gt;% 
   group_by(lugar_de_secuestro, ocupaciones, edad) %&gt;%
   summarise(cantidad_lugar = n()) %&gt;% 
   arrange(desc(cantidad_lugar)) %&gt;% 
   rename(&quot;Lugar de secuestro&quot; = lugar_de_secuestro, &quot;Ocupaciones&quot; = ocupaciones, &quot;Edad&quot; = edad, &quot;Víctimas&quot; = cantidad_lugar)</code></pre>
-<pre><code>## # A tibble: 6,161 × 4
-## # Groups:   Lugar de secuestro, Ocupaciones [4,922]
+<pre><code>## # A tibble: 5,795 × 4
+## # Groups:   Lugar de secuestro, Ocupaciones [4,651]
 ##    `Lugar de secuestro` Ocupaciones              Edad  Víctimas
 ##    &lt;chr&gt;                &lt;chr&gt;                    &lt;chr&gt;    &lt;int&gt;
 ##  1 CAPITAL FEDERAL      &lt;NA&gt;                     27          20
 ##  2 LA PLATA. BS. AS.    Estudiante Universitario 22          20
 ##  3 CAPITAL FEDERAL      Estudiante Universitario 22          18
-##  4 CAPITAL FEDERAL      &lt;NA&gt;                     21          18
-##  5 CAPITAL FEDERAL      &lt;NA&gt;                     25          18
-##  6 CAPITAL FEDERAL      &lt;NA&gt;                     24          17
+##  4 CAPITAL FEDERAL      &lt;NA&gt;                     24          17
+##  5 CAPITAL FEDERAL      &lt;NA&gt;                     21          16
+##  6 CAPITAL FEDERAL      &lt;NA&gt;                     25          16
 ##  7 CAPITAL FEDERAL      Estudiante Universitario 21          15
-##  8 CAPITAL FEDERAL      &lt;NA&gt;                     23          14
-##  9 CAPITAL FEDERAL      Estudiante Universitario 23          13
-## 10 CAPITAL FEDERAL      Estudiante Universitario 24          13
-## # … with 6,151 more rows</code></pre>
+##  8 CAPITAL FEDERAL      Estudiante Universitario 23          13
+##  9 CAPITAL FEDERAL      &lt;NA&gt;                     19          13
+## 10 CAPITAL FEDERAL      &lt;NA&gt;                     22          13
+## # … with 5,785 more rows</code></pre>
 <p>Resulta interesante que la ciudad de Mar de Plata se encuentra en 6°
 lugar de la tabla, por lo que buscamos las ocupaciones de las víctimas
-en el lugar. #Estaría bueno aclarar por qué consideran sorprentende ver
-a Mar del Plata en el 6to lugar. ¿Es porque es una ciudad relativamente
-chica? (San Miguel de Tucumán tiene actualmente una población similar a
-Mar del Plata y aparece 4ta. aunque una comparación más correcta sería
-con la población de esa época.)</p>
+en el lugar. De acuerdo a lo que vneimos explorando, nos resulta
+signifitiva la variable identitaria de estudiante. Cuando exploramos los
+lugares de secuestro, pensamos en las ciudades como universitarias. Nos
+llama la atencion que Mar del Plata esté en el sexto lugar de mayor
+cantidad de victimas, porque no consideramos que sea una ciudad
+universitari. Buscamos qué ocupaciones tienen las víctimas. #Estaria
+bueno profundizar Tucuman</p>
+<p>#Estaría bueno aclarar por qué consideran sorprentende ver a Mar del
+Plata en el 6to lugar. ¿Es porque es una ciudad relativamente chica?
+(San Miguel de Tucumán tiene actualmente una población similar a Mar del
+Plata y aparece 4ta. aunque una comparación más correcta sería con la
+población de esa época.)</p>
 <pre class="r"><code>victimas_parque %&gt;% 
+  group_by(fecha_de_secuestro) %&gt;% 
+  mutate(fecha = dmy(fecha_de_secuestro)) %&gt;% 
+  mutate(anio = year(fecha)) %&gt;% 
+  filter(anio %in% c(1976:1982)) %&gt;%
   filter(!is.na(lugar_de_secuestro)) %&gt;% 
   group_by(lugar_de_secuestro, ocupaciones) %&gt;%
   filter(lugar_de_secuestro == &quot;MAR DEL PLATA. BS. AS.&quot;) %&gt;% 
   summarise(cantidad_lugar = n()) %&gt;% 
   arrange(desc(cantidad_lugar)) %&gt;% 
-  rename(&quot;Lugar de secuestro&quot; = lugar_de_secuestro, &quot;Ocupaciones&quot; = ocupaciones, &quot;Víctimas&quot; = cantidad_lugar)</code></pre>
+  rename(&quot;Lugar de secuestro&quot; = lugar_de_secuestro, &quot;Ocupaciones&quot; = ocupaciones, &quot;Víctimas&quot; = cantidad_lugar) </code></pre>
 <pre><code>## # A tibble: 107 × 3
 ## # Groups:   Lugar de secuestro [1]
 ##    `Lugar de secuestro`   Ocupaciones               Víctimas
 ##    &lt;chr&gt;                  &lt;chr&gt;                        &lt;int&gt;
-##  1 MAR DEL PLATA. BS. AS. &lt;NA&gt;                            49
+##  1 MAR DEL PLATA. BS. AS. &lt;NA&gt;                            48
 ##  2 MAR DEL PLATA. BS. AS. Estudiante Universitaria        10
 ##  3 MAR DEL PLATA. BS. AS. Estudiante Universitario         9
 ##  4 MAR DEL PLATA. BS. AS. Albañil                          3
@@ -956,30 +981,38 @@ con la población de esa época.)</p>
 ##  9 MAR DEL PLATA. BS. AS. Obrero                           2
 ## 10 MAR DEL PLATA. BS. AS. Obrero De La Construcción        2
 ## # … with 97 more rows</code></pre>
-<p>Como el resto de las ciudades son universitarias, decidimos filtrar
-por espacios de militancia.</p>
 <pre class="r"><code>victimas_parque %&gt;% 
+  group_by(fecha_de_secuestro) %&gt;% 
+  mutate(fecha = dmy(fecha_de_secuestro)) %&gt;% 
+  mutate(anio = year(fecha)) %&gt;% 
+  filter(anio %in% c(1976:1982)) %&gt;%
   filter(!is.na(lugar_de_secuestro)) %&gt;% 
-  group_by(lugar_de_secuestro, militancia = as.character(militancia)) %&gt;%
+  group_by(lugar_de_secuestro, ocupaciones) %&gt;%
   filter(lugar_de_secuestro == &quot;MAR DEL PLATA. BS. AS.&quot;) %&gt;% 
+  filter(ocupaciones %in% c(&quot;Estudiante Universitario&quot;, &quot;Estudiante Universitaria&quot;, &quot;Estudiante&quot;, &quot;Estudiante Secundario&quot;)) %&gt;% 
   summarise(cantidad_lugar = n()) %&gt;% 
-  arrange(desc(cantidad_lugar)) %&gt;% 
-  rename(&quot;Lugar de secuestro&quot; = lugar_de_secuestro, &quot;Víctimas&quot; = cantidad_lugar, &quot;Espacio de miitancia&quot; = militancia)</code></pre>
-<pre><code>## # A tibble: 26 × 3
-## # Groups:   Lugar de secuestro [1]
-##    `Lugar de secuestro`   `Espacio de miitancia`                        Víctimas
-##    &lt;chr&gt;                  &lt;chr&gt;                                            &lt;int&gt;
-##  1 MAR DEL PLATA. BS. AS. &quot;list(listado = character(0))&quot;                      93
-##  2 MAR DEL PLATA. BS. AS. &quot;list(listado = \&quot;Partido Socialista de los …       20
-##  3 MAR DEL PLATA. BS. AS. &quot;list(listado = \&quot;Partido Comunista Marxista…       16
-##  4 MAR DEL PLATA. BS. AS. &quot;list(listado = \&quot;Juventud Peronista (JP)\&quot;)&quot;       13
-##  5 MAR DEL PLATA. BS. AS. &quot;list(listado = \&quot;Montoneros\&quot;)&quot;                     9
-##  6 MAR DEL PLATA. BS. AS. &quot;list(listado = \&quot;Peronista\&quot;)&quot;                      6
-##  7 MAR DEL PLATA. BS. AS. &quot;list(listado = \&quot;Juventud Universitaria Per…        4
-##  8 MAR DEL PLATA. BS. AS. &quot;list(listado = c(\&quot;Juventud Peronista (JP)\…        2
-##  9 MAR DEL PLATA. BS. AS. &quot;list(listado = c(\&quot;Juventud Universitaria P…        2
-## 10 MAR DEL PLATA. BS. AS. &quot;list(listado = \&quot;Ejército Revolucionario de…        1
-## # … with 16 more rows</code></pre>
+  arrange(desc(cantidad_lugar)) </code></pre>
+<pre><code>## # A tibble: 4 × 3
+## # Groups:   lugar_de_secuestro [1]
+##   lugar_de_secuestro     ocupaciones              cantidad_lugar
+##   &lt;chr&gt;                  &lt;chr&gt;                             &lt;int&gt;
+## 1 MAR DEL PLATA. BS. AS. Estudiante Universitaria             10
+## 2 MAR DEL PLATA. BS. AS. Estudiante Universitario              9
+## 3 MAR DEL PLATA. BS. AS. Estudiante                            3
+## 4 MAR DEL PLATA. BS. AS. Estudiante Secundario                 1</code></pre>
+<p>Como no nos parece significativa la cantidad de victimas estudiantes,
+decidimos buscar los espacios de militancia de las victimas. Como el
+resto de las ciudades son universitarias, decidimos filtrar por espacios
+de militancia.</p>
+<pre class="r"><code>militancias %&gt;% 
+  group_by(lugar_de_secuestro, orga1) %&gt;% 
+  filter(lugar_de_secuestro == &quot;MAR DEL PLATA. BS. AS.&quot;) %&gt;% 
+  summarise(cant_por_militancia = n()) %&gt;% 
+  arrange(desc(cant_por_militancia)) %&gt;% 
+  head(5) %&gt;% 
+  ggplot(aes(orga1, cant_por_militancia)) +
+  geom_col()</code></pre>
+<p><img src="data:image/png;base64,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" width="672" /></p>
 <pre class="r"><code>victimas_parque %&gt;% 
   mutate(edad = as.numeric(edad)) %&gt;% 
   summarise(edad_max = max(edad, na.rm = TRUE), 
@@ -1105,7 +1138,15 @@ características identitarias de las víctimas.</p>
   filter(anio %in% c(1976:1982)) %&gt;% 
   summarise(victimas_por_anio = n()) %&gt;% 
   arrange(desc(anio)) </code></pre>
-<p>Filtro Victimas del 78 al 82, agrupando por su edad y año.</p>
+<pre class="r"><code>victimas_76_82 %&gt;% 
+  group_by(anio) %&gt;% 
+  summarise(cantidad_victimas = n()) %&gt;% 
+  summarise(sum(cantidad_victimas))</code></pre>
+<pre><code>## # A tibble: 1 × 1
+##   `sum(cantidad_victimas)`
+##                      &lt;int&gt;
+## 1                     4276</code></pre>
+<p>Filtro Victimas del 76 al 82, agrupando por su edad y año.</p>
 <pre class="r"><code>victimas_76_82 %&gt;% 
   filter(!is.na(ocupaciones)) %&gt;% 
   group_by(edad, anio) %&gt;% 
@@ -1136,12 +1177,12 @@ total de víctimas</p>
   mutate(prop = n/sum(n)) %&gt;% 
   mutate(prop = scales::percent(prop)) %&gt;% 
   gt::gt()</code></pre>
-<div id="dxjkbrbhzy" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="bnfpwzqihv" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>html {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#dxjkbrbhzy .gt_table {
+#bnfpwzqihv .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -1166,7 +1207,7 @@ total de víctimas</p>
   border-left-color: #D3D3D3;
 }
 
-#dxjkbrbhzy .gt_heading {
+#bnfpwzqihv .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -1178,7 +1219,7 @@ total de víctimas</p>
   border-right-color: #D3D3D3;
 }
 
-#dxjkbrbhzy .gt_title {
+#bnfpwzqihv .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -1190,7 +1231,7 @@ total de víctimas</p>
   border-bottom-width: 0;
 }
 
-#dxjkbrbhzy .gt_subtitle {
+#bnfpwzqihv .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -1202,13 +1243,13 @@ total de víctimas</p>
   border-top-width: 0;
 }
 
-#dxjkbrbhzy .gt_bottom_border {
+#bnfpwzqihv .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#dxjkbrbhzy .gt_col_headings {
+#bnfpwzqihv .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1223,7 +1264,7 @@ total de víctimas</p>
   border-right-color: #D3D3D3;
 }
 
-#dxjkbrbhzy .gt_col_heading {
+#bnfpwzqihv .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1243,7 +1284,7 @@ total de víctimas</p>
   overflow-x: hidden;
 }
 
-#dxjkbrbhzy .gt_column_spanner_outer {
+#bnfpwzqihv .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1255,15 +1296,15 @@ total de víctimas</p>
   padding-right: 4px;
 }
 
-#dxjkbrbhzy .gt_column_spanner_outer:first-child {
+#bnfpwzqihv .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#dxjkbrbhzy .gt_column_spanner_outer:last-child {
+#bnfpwzqihv .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#dxjkbrbhzy .gt_column_spanner {
+#bnfpwzqihv .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -1275,7 +1316,7 @@ total de víctimas</p>
   width: 100%;
 }
 
-#dxjkbrbhzy .gt_group_heading {
+#bnfpwzqihv .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1300,7 +1341,7 @@ total de víctimas</p>
   vertical-align: middle;
 }
 
-#dxjkbrbhzy .gt_empty_group_heading {
+#bnfpwzqihv .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -1315,15 +1356,15 @@ total de víctimas</p>
   vertical-align: middle;
 }
 
-#dxjkbrbhzy .gt_from_md > :first-child {
+#bnfpwzqihv .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#dxjkbrbhzy .gt_from_md > :last-child {
+#bnfpwzqihv .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#dxjkbrbhzy .gt_row {
+#bnfpwzqihv .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1342,7 +1383,7 @@ total de víctimas</p>
   overflow-x: hidden;
 }
 
-#dxjkbrbhzy .gt_stub {
+#bnfpwzqihv .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1355,7 +1396,7 @@ total de víctimas</p>
   padding-right: 5px;
 }
 
-#dxjkbrbhzy .gt_stub_row_group {
+#bnfpwzqihv .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1369,11 +1410,11 @@ total de víctimas</p>
   vertical-align: top;
 }
 
-#dxjkbrbhzy .gt_row_group_first td {
+#bnfpwzqihv .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#dxjkbrbhzy .gt_summary_row {
+#bnfpwzqihv .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1383,16 +1424,16 @@ total de víctimas</p>
   padding-right: 5px;
 }
 
-#dxjkbrbhzy .gt_first_summary_row {
+#bnfpwzqihv .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#dxjkbrbhzy .gt_first_summary_row.thick {
+#bnfpwzqihv .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#dxjkbrbhzy .gt_last_summary_row {
+#bnfpwzqihv .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1402,7 +1443,7 @@ total de víctimas</p>
   border-bottom-color: #D3D3D3;
 }
 
-#dxjkbrbhzy .gt_grand_summary_row {
+#bnfpwzqihv .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1412,7 +1453,7 @@ total de víctimas</p>
   padding-right: 5px;
 }
 
-#dxjkbrbhzy .gt_first_grand_summary_row {
+#bnfpwzqihv .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1422,11 +1463,11 @@ total de víctimas</p>
   border-top-color: #D3D3D3;
 }
 
-#dxjkbrbhzy .gt_striped {
+#bnfpwzqihv .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#dxjkbrbhzy .gt_table_body {
+#bnfpwzqihv .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1435,7 +1476,7 @@ total de víctimas</p>
   border-bottom-color: #D3D3D3;
 }
 
-#dxjkbrbhzy .gt_footnotes {
+#bnfpwzqihv .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1449,7 +1490,7 @@ total de víctimas</p>
   border-right-color: #D3D3D3;
 }
 
-#dxjkbrbhzy .gt_footnote {
+#bnfpwzqihv .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-left: 4px;
@@ -1458,7 +1499,7 @@ total de víctimas</p>
   padding-right: 5px;
 }
 
-#dxjkbrbhzy .gt_sourcenotes {
+#bnfpwzqihv .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1472,7 +1513,7 @@ total de víctimas</p>
   border-right-color: #D3D3D3;
 }
 
-#dxjkbrbhzy .gt_sourcenote {
+#bnfpwzqihv .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -1480,64 +1521,64 @@ total de víctimas</p>
   padding-right: 5px;
 }
 
-#dxjkbrbhzy .gt_left {
+#bnfpwzqihv .gt_left {
   text-align: left;
 }
 
-#dxjkbrbhzy .gt_center {
+#bnfpwzqihv .gt_center {
   text-align: center;
 }
 
-#dxjkbrbhzy .gt_right {
+#bnfpwzqihv .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#dxjkbrbhzy .gt_font_normal {
+#bnfpwzqihv .gt_font_normal {
   font-weight: normal;
 }
 
-#dxjkbrbhzy .gt_font_bold {
+#bnfpwzqihv .gt_font_bold {
   font-weight: bold;
 }
 
-#dxjkbrbhzy .gt_font_italic {
+#bnfpwzqihv .gt_font_italic {
   font-style: italic;
 }
 
-#dxjkbrbhzy .gt_super {
+#bnfpwzqihv .gt_super {
   font-size: 65%;
 }
 
-#dxjkbrbhzy .gt_footnote_marks {
+#bnfpwzqihv .gt_footnote_marks {
   font-style: italic;
   font-weight: normal;
   font-size: 75%;
   vertical-align: 0.4em;
 }
 
-#dxjkbrbhzy .gt_asterisk {
+#bnfpwzqihv .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#dxjkbrbhzy .gt_indent_1 {
+#bnfpwzqihv .gt_indent_1 {
   text-indent: 5px;
 }
 
-#dxjkbrbhzy .gt_indent_2 {
+#bnfpwzqihv .gt_indent_2 {
   text-indent: 10px;
 }
 
-#dxjkbrbhzy .gt_indent_3 {
+#bnfpwzqihv .gt_indent_3 {
   text-indent: 15px;
 }
 
-#dxjkbrbhzy .gt_indent_4 {
+#bnfpwzqihv .gt_indent_4 {
   text-indent: 20px;
 }
 
-#dxjkbrbhzy .gt_indent_5 {
+#bnfpwzqihv .gt_indent_5 {
   text-indent: 25px;
 }
 </style>
@@ -1594,117 +1635,98 @@ identitaria que más se repite en las víctimas y cuál es su relación con
 el lugar del hecho y el año en que ocurrieron.</p>
 <p>variable identitaria más repetida y su relación con el lugar del
 hecho y el año en que ocurrieron</p>
-<p>DESARMANDO LA TABLA DE MILITANCIA</p>
-<pre class="r"><code>militancias &lt;- victimas_parque %&gt;% 
-  tidyr::unnest(militancia) %&gt;% 
-  select(id, ocupaciones, lugar_de_secuestro, listado)
-
-militancias</code></pre>
-<pre><code>## # A tibble: 4,156 × 4
-##    id    ocupaciones                                  lugar_de_secuestro listado
-##    &lt;chr&gt; &lt;chr&gt;                                        &lt;chr&gt;              &lt;chr&gt;  
-##  1 50    &lt;NA&gt;                                         CAPITAL FEDERAL    Ejérci…
-##  2 2124  Obrero en Cuerpo Del Dto Gral De Irrigación  Secuestrado de su… Partid…
-##  3 2128  Estudiante Universitario                     CAPITAL FEDERAL (… Delega…
-##  4 2128  Estudiante Universitario                     CAPITAL FEDERAL (… Juvent…
-##  5 245   Estudiante Universitario                     &lt;NA&gt;               Monton…
-##  6 2303  Estudiante Universitario                     &lt;NA&gt;               Monton…
-##  7 9825  &lt;NA&gt;                                         &lt;NA&gt;               Monton…
-##  8 2134  Operario en Acindar, Villa Constitución      VILLA CONSTITUCIO… Asocia…
-##  9 2134  Operario en Acindar, Villa Constitución      VILLA CONSTITUCIO… Monton…
-## 10 2136  Concejal en Concejo Deliberante De Clodomira LA BANDA. SANTIAG… Partid…
-## # … with 4,146 more rows</code></pre>
+<p>##Conclusión: decidir que hacer con el grafico</p>
+<p>Lugar de secuestro con espacio de militancia - mar del plata</p>
 <pre class="r"><code>militancias %&gt;% 
-  filter(ocupaciones %in% c(&quot;Estudiante Universitario&quot;, &quot;Estudiante Universitaria&quot;, &quot;Estudiante&quot;, &quot;Estudiante Secundario&quot;)) %&gt;% 
-  group_by(ocupaciones, listado) %&gt;% 
-  summarise(cantidad = n()) %&gt;% 
-  arrange(desc(cantidad))</code></pre>
-<pre><code>## # A tibble: 124 × 3
-## # Groups:   ocupaciones [4]
-##    ocupaciones              listado                                     cantidad
-##    &lt;chr&gt;                    &lt;chr&gt;                                          &lt;int&gt;
-##  1 Estudiante Universitario Juventud Universitaria Peronista (JUP)            90
-##  2 Estudiante Universitario Montoneros                                        78
-##  3 Estudiante Universitaria Montoneros                                        73
-##  4 Estudiante Universitaria Juventud Universitaria Peronista (JUP)            43
-##  5 Estudiante Universitaria Partido Revolucionario de los Trabajadores…       35
-##  6 Estudiante Universitario Juventud Peronista (JP)                           31
-##  7 Estudiante Secundario    Unión de Estudiantes Secundarios (UES)            24
-##  8 Estudiante Universitario Partido Revolucionario de los Trabajadores…       23
-##  9 Estudiante               Montoneros                                        14
-## 10 Estudiante Universitario Federación Juvenil Comunista (FJC)                13
-## # … with 114 more rows</code></pre>
-<pre class="r"><code>militancias %&gt;% 
-  group_by(id) %&gt;% 
-  summarise(cantidad = n()) %&gt;% 
-  filter(cantidad == 1)</code></pre>
-<pre><code>## # A tibble: 2,999 × 2
-##    id    cantidad
-##    &lt;chr&gt;    &lt;int&gt;
-##  1 10           1
-##  2 10004        1
-##  3 1001         1
-##  4 10010        1
-##  5 10014        1
-##  6 10015        1
-##  7 10021        1
-##  8 10025        1
-##  9 10027        1
-## 10 10032        1
-## # … with 2,989 more rows</code></pre>
-<p>victimas con dos espacios de militancia</p>
-<pre class="r"><code>militancias %&gt;% 
-  group_by(id, ocupaciones) %&gt;% 
-  summarise(cantidad = n()) %&gt;% 
-  filter(cantidad == 2)</code></pre>
-<pre><code>## # A tibble: 491 × 3
-## # Groups:   id [491]
-##    id    ocupaciones                                                    cantidad
-##    &lt;chr&gt; &lt;chr&gt;                                                             &lt;int&gt;
-##  1 10012 &lt;NA&gt;                                                                  2
-##  2 101   Estudiante Universitario                                              2
-##  3 10230 Docente en Escuela Nº 27 D.e. 19 (villa Lugano)                       2
-##  4 10261 &lt;NA&gt;                                                                  2
-##  5 10268 Obrero De La Construcción, Pescador en Puerto De Mar Del Plata        2
-##  6 10270 Obrero                                                                2
-##  7 10272 Obrero Electricista en Fiplasto Sa, Ramallo                           2
-##  8 10278 &lt;NA&gt;                                                                  2
-##  9 10282 Ex Obrero Portuario, Estibador; Obrero Metalúrgico en Metalúr…        2
-## 10 1092  Empleado en Aserradero                                                2
-## # … with 481 more rows</code></pre>
-<pre class="r"><code>militancias %&gt;% 
-  group_by(id) %&gt;% 
-  summarise(cantidad = n()) %&gt;% 
-  filter(cantidad == 3)</code></pre>
-<pre><code>## # A tibble: 49 × 2
-##    id    cantidad
-##    &lt;chr&gt;    &lt;int&gt;
-##  1 1267         3
-##  2 1359         3
-##  3 144          3
-##  4 1502         3
-##  5 1675         3
-##  6 1807         3
-##  7 198          3
-##  8 2120         3
-##  9 2378         3
-## 10 2432         3
-## # … with 39 more rows</code></pre>
-<pre class="r"><code>militancias %&gt;% 
-  group_by(id, ocupaciones) %&gt;% 
-  summarise(cantidad = n()) %&gt;% 
-  filter(cantidad == 4) </code></pre>
-<pre><code>## # A tibble: 7 × 3
-## # Groups:   id [7]
-##   id    ocupaciones                                                     cantidad
-##   &lt;chr&gt; &lt;chr&gt;                                                              &lt;int&gt;
-## 1 1833  &lt;NA&gt;                                                                   4
-## 2 2345  Estudiante Universitario                                               4
-## 3 278   &lt;NA&gt;                                                                   4
-## 4 5388  Enfermera y Docente en Hospital De Clínicas / UBA             …        4
-## 5 6463  Psicóloga, Docente en Universidad De Morón                    …        4
-## 6 6969  Estudiante Universitario                                               4
-## 7 921   Empleado en Obras Sanitarias De La Nación                              4</code></pre>
+  group_by(lugar_de_secuestro, orga1) %&gt;% 
+  filter(lugar_de_secuestro == &quot;MAR DEL PLATA. BS. AS.&quot;) %&gt;% 
+  summarise(cant_por_militancia = n()) %&gt;% 
+  arrange(desc(cant_por_militancia)) %&gt;% 
+  head(5) %&gt;% 
+  ggplot(aes(orga1, cant_por_militancia)) +
+  geom_col()</code></pre>
+<p><img src="data:image/png;base64,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" width="672" /></p>
+<pre class="r"><code>militancia_lugar_secuestro &lt;- militancias %&gt;% 
+  group_by(edad, fecha_de_secuestro, orga1, orga2, orga3, orga4, lugar_de_secuestro) %&gt;% 
+  summarise(cant_por_militancia = n()) %&gt;% 
+  arrange(desc(cant_por_militancia))</code></pre>
+<pre class="r"><code>filtro_lugar &lt;- militancia_lugar_secuestro %&gt;% 
+  group_by(fecha_de_secuestro) %&gt;% 
+  mutate(fecha = dmy(fecha_de_secuestro)) %&gt;% 
+  mutate(anio = year(fecha)) %&gt;% 
+  group_by( anio, orga1, lugar_de_secuestro) %&gt;% 
+  summarise(cant_por_militancia = n()) %&gt;% 
+  arrange(desc(cant_por_militancia)) %&gt;% 
+  mutate(sindicato = case_when(
+  stringr::str_detect(orga1, &quot;Sind&quot;) ~ &quot;sindicalista&quot;,
+  stringr::str_detect(orga1, &quot;sind&quot;) ~ &quot;sindicalista&quot;,
+  stringr::str_detect(orga1, &quot;Delega&quot;) ~ &quot;sindicalista&quot;,
+  stringr::str_detect(orga1, &quot;delega&quot;) ~ &quot;sindicalista&quot;,
+  stringr::str_detect(orga1, &quot;ATE&quot;) ~ &quot;sindicalista&quot;,
+  stringr::str_detect(orga1, &quot;UOCRA&quot;) ~ &quot;sindicalista&quot;,
+  stringr::str_detect(orga1, &quot;Obrer&quot;) ~ &quot;sindicalista&quot;,
+  stringr::str_detect(orga1, &quot;obrer&quot;) ~ &quot;sindicalista&quot;,
+  stringr::str_detect(orga1, &quot;Trab&quot;) ~ &quot;sindicalista&quot;,
+  stringr::str_detect(orga1, &quot;trab&quot;) ~ &quot;sindicalista&quot;,
+  stringr::str_detect(orga1, &quot;UOM&quot;) ~ &quot;sindicalista&quot;,
+  stringr::str_detect(orga1, &quot;CGT&quot;) ~ &quot;sindicalista&quot;,
+  stringr::str_detect(orga1, &quot;UTA&quot;) ~ &quot;sindicalista&quot;,
+  stringr::str_detect(orga1, &quot;UPCN&quot;) ~ &quot;sindicalista&quot;,
+  stringr::str_detect(orga1, &quot;Grem&quot;) ~ &quot;sindicalista&quot;,
+  stringr::str_detect(orga1, &quot;grem&quot;) ~ &quot;sindicalista&quot;))</code></pre>
+<pre class="r"><code>filtro_lugar %&gt;% 
+  filter(lugar_de_secuestro == &quot;MAR DEL PLATA. BS. AS.&quot;) %&gt;% 
+  group_by(lugar_de_secuestro,orga1) %&gt;% 
+  summarise(n = n()) %&gt;% 
+  arrange(desc(n))</code></pre>
+<pre><code>## # A tibble: 22 × 3
+## # Groups:   lugar_de_secuestro [1]
+##    lugar_de_secuestro     orga1                                            n
+##    &lt;chr&gt;                  &lt;chr&gt;                                        &lt;int&gt;
+##  1 MAR DEL PLATA. BS. AS. Juventud Universitaria Peronista (JUP)           3
+##  2 MAR DEL PLATA. BS. AS. Montoneros                                       3
+##  3 MAR DEL PLATA. BS. AS. Partido Comunista Marxista Leninista (PCML)      3
+##  4 MAR DEL PLATA. BS. AS. Partido Socialista de los Trabajadores (PST)     3
+##  5 MAR DEL PLATA. BS. AS. Juventud Peronista (JP)                          2
+##  6 MAR DEL PLATA. BS. AS. Peronista                                        2
+##  7 MAR DEL PLATA. BS. AS. Ejército Revolucionario del Pueblo (ERP)         1
+##  8 MAR DEL PLATA. BS. AS. Gremio Peronista                                 1
+##  9 MAR DEL PLATA. BS. AS. Juventud de Trabajadores Peronistas (JTP)        1
+## 10 MAR DEL PLATA. BS. AS. Marxista Leninista                               1
+## # … with 12 more rows</code></pre>
+<pre class="r"><code>filtro_lugar %&gt;% 
+  filter(anio %in% c(1976:1982)) %&gt;%
+  filter(lugar_de_secuestro == &quot;MAR DEL PLATA. BS. AS.&quot;) %&gt;% 
+  group_by(lugar_de_secuestro, orga1, sindicato) %&gt;% 
+  filter(sindicato == &quot;sindicalista&quot;) %&gt;% 
+  summarise(n = n()) %&gt;% 
+  arrange(desc(n))</code></pre>
+<pre><code>## # A tibble: 8 × 4
+## # Groups:   lugar_de_secuestro, orga1 [8]
+##   lugar_de_secuestro     orga1                                     sindi…¹     n
+##   &lt;chr&gt;                  &lt;chr&gt;                                     &lt;chr&gt;   &lt;int&gt;
+## 1 MAR DEL PLATA. BS. AS. Partido Socialista de los Trabajadores (… sindic…     3
+## 2 MAR DEL PLATA. BS. AS. Gremio Peronista                          sindic…     1
+## 3 MAR DEL PLATA. BS. AS. Juventud de Trabajadores Peronistas (JTP) sindic…     1
+## 4 MAR DEL PLATA. BS. AS. Militante sindical                        sindic…     1
+## 5 MAR DEL PLATA. BS. AS. P. Soc. Obrero, Gremialista               sindic…     1
+## 6 MAR DEL PLATA. BS. AS. Partido Revolucionario de los Trabajador… sindic…     1
+## 7 MAR DEL PLATA. BS. AS. Sindicato Gastronómico                    sindic…     1
+## 8 MAR DEL PLATA. BS. AS. Unión Obrera de la Construcción de la Re… sindic…     1
+## # … with abbreviated variable name ¹​sindicato</code></pre>
+<p>Tucuman</p>
+<pre class="r"><code>filtro_lugar %&gt;% 
+  filter(anio %in% c(1976:1982)) %&gt;%
+  filter(lugar_de_secuestro == &quot;TUCUMAN&quot;) %&gt;% 
+  group_by(lugar_de_secuestro, orga1, sindicato) %&gt;% 
+  filter(sindicato == &quot;sindicalista&quot;) %&gt;% 
+  summarise(n = n()) %&gt;% 
+  arrange(desc(n))</code></pre>
+<pre><code>## # A tibble: 1 × 4
+## # Groups:   lugar_de_secuestro, orga1 [1]
+##   lugar_de_secuestro orga1              sindicato        n
+##   &lt;chr&gt;              &lt;chr&gt;              &lt;chr&gt;        &lt;int&gt;
+## 1 TUCUMAN            Militante sindical sindicalista     1</code></pre>
 <p>probando codigo para comprara cantidad de victimas por años</p>
 <pre class="r"><code>anio_real &lt;- victimas_parque %&gt;%
   group_by(fecha_de_secuestro) %&gt;% 

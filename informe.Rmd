@@ -51,7 +51,7 @@ Selección de variables de victimas_parque:
 victimas_parque <- select(parque_de_la_memoria, id, edad, fecha_de_secuestro, ano_en_monumento, lugar_de_secuestro, ocupaciones, sexo, militancia)
 ```
 
-Ahora, exploramos las especificaciones de victimas_parque. Queremos saber qué contiene.
+Exploramos las especificaciones de victimas_parque. Queremos saber qué contiene.
 
 ```{r}
 victimas_parque %>% 
