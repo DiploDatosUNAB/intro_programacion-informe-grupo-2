@@ -76,9 +76,11 @@ Exploración por edad de las victimas.
 ```{r}
 victimas_parque %>% 
   filter(edad != "-") %>% 
-  group_by(edad) %>% 
+  group_by(edad = as.numeric(edad)) %>% 
   summarise(cantidad = n()) %>% 
-  arrange(desc(cantidad)) 
+  arrange(desc(cantidad)) %>% 
+  rename("Víctimas" = cantidad, "Edad" = edad) %>% 
+  gt::gt()
 ```
 
 Una vez filtrado por edad, nos interesa conocer la cantidad de víctimas por edad y por sexo.
