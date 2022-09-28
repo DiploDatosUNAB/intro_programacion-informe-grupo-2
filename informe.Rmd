@@ -81,7 +81,7 @@ victimas_parque %>%
   arrange(desc(cantidad)) 
 ```
 
-Una vez filtrado por edad, nos interesa poder cruzar la cantidad de víctimas por edad y por sexo.
+Una vez filtrado por edad, nos interesa conocer la cantidad de víctimas por edad y por sexo.
 
 ```{r}
 victimas_parque %>% 
