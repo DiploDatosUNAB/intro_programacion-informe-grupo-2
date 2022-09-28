@@ -84,7 +84,6 @@ victimas_parque %>%
 ```
 
 Una vez filtrado por edad, nos interesa conocer la cantidad de víctimas por edad y por sexo.
-
 ```{r}
 victimas_parque %>% 
   filter(edad != "-") %>% 
@@ -98,7 +97,6 @@ victimas_parque %>%
 ```
 
 Nos interesa explorar la variable ocupaciones.
-
 ```{r}
 victimas_parque %>% 
   group_by(ocupaciones) %>% 
@@ -106,6 +104,7 @@ victimas_parque %>%
   arrange(desc(cant_ocupaciones)) %>% 
   rename("Ocupaciones" = ocupaciones, "Víctimas" = cant_ocupaciones)
 ```
+
 
 También exploramos por edad y ocupaciones de las víctimas.
 
