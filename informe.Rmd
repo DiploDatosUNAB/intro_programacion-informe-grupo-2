@@ -333,9 +333,6 @@ victimas_parque %>%
 
 Resulta interesante que la ciudad de Mar de Plata se encuentra en 6° lugar de la tabla, por lo que buscamos las ocupaciones de las víctimas en el lugar. 
 De acuerdo a lo que vneimos explorando, nos resulta signifitiva la variable identitaria de estudiante. Cuando exploramos los lugares de secuestro, pensamos en las ciudades como universitarias. Nos llama la atencion que Mar del Plata esté en el sexto lugar de mayor cantidad de victimas, porque no consideramos que sea una ciudad universitari. Buscamos qué ocupaciones tienen las víctimas. 
-#Estaria bueno profundizar Tucuman
-
-#Estaría bueno aclarar por qué consideran sorprentende ver a Mar del Plata en el 6to lugar. ¿Es porque es una ciudad relativamente chica? (San Miguel de Tucumán tiene actualmente una población similar a Mar del Plata y aparece 4ta. aunque una comparación más correcta sería con la población de esa época.)
 
 ```{r}
 victimas_parque %>% 
