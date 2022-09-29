@@ -83,6 +83,7 @@ victimas_parque %>%
   gt::gt()
 ```
 
+
 Una vez filtrado por edad, nos interesa conocer la cantidad de víctimas por edad y por sexo.
 ```{r}
 victimas_parque %>% 
@@ -96,6 +97,7 @@ victimas_parque %>%
   xlab("Edad") + ylab("Cantidad de víctimas")
 ```
 
+
 Nos interesa explorar la variable ocupaciones.
 ```{r}
 victimas_parque %>% 
@@ -107,7 +109,6 @@ victimas_parque %>%
 
 
 También exploramos por edad y ocupaciones de las víctimas.
-
 ```{r}
 victimas_parque %>%
   filter(!is.na(ocupaciones)) %>% 
@@ -116,6 +117,8 @@ victimas_parque %>%
   arrange(desc(cantidad))%>% 
   rename("Edad" = edad, "Ocupaciones" = ocupaciones, "Víctimas" = cantidad )
 ```
+Del gráfico anterior, nos resultó interesante la cantidad de víctimas con ocupación Estudiante, Estudiante Universitaria/o y Estudiante Secundario.
+
 
 Exploramos por ocupación y sexo, filtrando las ocupaciones con cantidad de víctimas mayor a 50. El motivo de la elección surge de buscar qué ocupaciones eran más relevantes y si estas tienen una relación con la militancia.
 
@@ -125,10 +128,13 @@ victimas_parque %>%
   summarise(cant_ocupaciones = n()) %>% 
   arrange(desc(cant_ocupaciones)) %>% 
   filter(cant_ocupaciones > 50) %>% 
-  rename("Ocupaciones" = ocupaciones, "Sexo" = sexo, "Víctimas" = cant_ocupaciones)
+  ggplot(aes(ocupaciones, cant_ocupaciones)) + 
+  geom_col(aes(fill = sexo), position = "dodge") +
+  xlab("Ocupaciones") + ylab("Cantidad de víctimas") +
+  theme(axis.text = element_text(size = 7))
 ```
 
-Ahora procedemos a eliminar todos los datos faltantes (NA) de la tabla.
+Ahora procedemos a eliminar todos los datos faltantes (NA).
 
 ```{r}
 victimas_parque %>% 
@@ -137,11 +143,15 @@ victimas_parque %>%
   summarise(cant_ocupaciones = n()) %>% 
   arrange(desc(cant_ocupaciones)) %>% 
   filter(cant_ocupaciones > 50) %>% 
-  rename("Ocupaciones" = ocupaciones, "Sexo" = sexo, "Víctimas" = cant_ocupaciones)
+  ggplot(aes(ocupaciones, cant_ocupaciones)) + 
+  geom_col(aes(fill = sexo), position = "dodge") +
+  xlab("Ocupaciones") + ylab("Cantidad de víctimas") +
+  theme(axis.text = element_text(size = 7))
 ```
 
-Queremos saber cuáles fueron los años con mayor cantidad de asesinatos y secuestros.
 
+
+Queremos saber cuáles fueron los años con mayor cantidad de asesinatos y secuestros.
 ```{r}
 victimas_parque %>% 
   group_by(fecha_de_secuestro) %>% 
@@ -150,7 +160,9 @@ victimas_parque %>%
   group_by(anio) %>% 
   summarise(victimas_por_anio = n()) %>% 
   arrange(desc(victimas_por_anio)) %>% 
-  rename("Año de secuestro/asesinato" = anio, "Víctimas" = victimas_por_anio)
+  ggplot(aes(anio, victimas_por_anio)) + 
+  geom_col() + 
+  xlab("Año de secuestro/asesinato") + ylab("Cantidad de víctimas")
 ```
 
 Cruzamos la cantidad de víctimas por edad y año de secuestro o asesinato.
@@ -187,11 +199,12 @@ victimas_parque %>%
   filter(edad %in% c(19, 20, 21, 22, 23, 24, 25, 26, 27)) %>% 
   group_by(edad) %>% 
   summarise(cant_vict_edad = n())  %>% 
-  rename("Edad" = edad, "Víctimas" = cant_vict_edad)
+  rename("Edad" = edad, "Víctimas" = cant_vict_edad) %>% 
+  gt::gt()
 ```
 
-Nos pareció interesante conocer los espacios de militancia de las víctimas.
 
+Nos pareció interesante conocer los espacios de militancia de las víctimas.
 ```{r}
 militancias <- unnest(victimas_parque, militancia) %>% 
   separate(listado, into = c("orga1", "orga2", "orga3", "orga4"), sep =" - ")
@@ -209,6 +222,7 @@ militancia_sindical <- militancias %>%
   summarise(cant_por_militancia = n()) %>% 
   arrange(desc(cant_por_militancia))
 ```
+
 
 ```{r}
 filtro_ms <- militancia_sindical %>% 
