@@ -92,7 +92,7 @@ victimas_parque %>%
   mutate(edad = as.numeric(edad)) %>%
   summarise(cantidad = n()) %>% 
   arrange(desc(edad)) %>%
-  ggplot(aes(edad, cantidad)) + 
+  ggplot(aes(edad, cantidad)) +
   geom_col(aes(color = sexo)) +
   xlab("Edad") + ylab("Cantidad de víctimas")
 ```
@@ -130,6 +130,7 @@ victimas_parque %>%
   filter(cant_ocupaciones > 50) %>% 
   ggplot(aes(ocupaciones, cant_ocupaciones)) + 
   geom_col(aes(fill = sexo), position = "dodge") +
+  labs(fill = "Sexo") +
   xlab("Ocupaciones") + ylab("Cantidad de víctimas") +
   theme(axis.text = element_text(size = 7))
 ```
@@ -145,6 +146,7 @@ victimas_parque %>%
   filter(cant_ocupaciones > 50) %>% 
   ggplot(aes(ocupaciones, cant_ocupaciones)) + 
   geom_col(aes(fill = sexo), position = "dodge") +
+  labs(fill = "Sexo") +
   xlab("Ocupaciones") + ylab("Cantidad de víctimas") +
   theme(axis.text = element_text(size = 7))
 ```
@@ -161,7 +163,8 @@ victimas_parque %>%
   summarise(victimas_por_anio = n()) %>% 
   arrange(desc(victimas_por_anio)) %>% 
   ggplot(aes(anio, victimas_por_anio)) + 
-  geom_col() + 
+  geom_col(aes(fill = victimas_por_anio)) + 
+  labs(fill = "Cantidad de víctimas") + 
   xlab("Año de secuestro/asesinato") + ylab("Cantidad de víctimas")
 ```
 
@@ -216,56 +219,7 @@ militancias <- unnest(victimas_parque, militancia) %>%
   summarise(cant_por_militancia = n()) %>% 
   arrange(desc(cant_por_militancia)) 
 ```
-```{r}
-militancia_sindical <- militancias %>% 
-  group_by(edad, fecha_de_secuestro, orga1, orga2, orga3, orga4) %>% 
-  summarise(cant_por_militancia = n()) %>% 
-  arrange(desc(cant_por_militancia))
-```
 
-
-```{r}
-filtro_ms <- militancia_sindical %>% 
-  group_by(fecha_de_secuestro) %>% 
-  mutate(fecha = dmy(fecha_de_secuestro)) %>% 
-  mutate(anio = year(fecha)) %>% 
-  group_by(edad, anio, orga1) %>% 
-  summarise(cant_por_militancia = n()) %>% 
-  arrange(desc(cant_por_militancia)) %>% 
-  mutate(sindicato = case_when(
-  stringr::str_detect(orga1, "Sind") ~ "sindicalista",
-  stringr::str_detect(orga1, "sind") ~ "sindicalista",
-  stringr::str_detect(orga1, "Delega") ~ "sindicalista",
-  stringr::str_detect(orga1, "delega") ~ "sindicalista",
-  stringr::str_detect(orga1, "ATE") ~ "sindicalista",
-  stringr::str_detect(orga1, "UOCRA") ~ "sindicalista",
-  stringr::str_detect(orga1, "Obrer") ~ "sindicalista",
-  stringr::str_detect(orga1, "obrer") ~ "sindicalista",
-  stringr::str_detect(orga1, "Trab") ~ "sindicalista",
-  stringr::str_detect(orga1, "trab") ~ "sindicalista",
-  stringr::str_detect(orga1, "UOM") ~ "sindicalista",
-  stringr::str_detect(orga1, "CGT") ~ "sindicalista",
-  stringr::str_detect(orga1, "UTA") ~ "sindicalista",
-  stringr::str_detect(orga1, "UPCN") ~ "sindicalista",
-  stringr::str_detect(orga1, "Grem") ~ "sindicalista",
-  stringr::str_detect(orga1, "grem") ~ "sindicalista"))
-```
-
-```{r}
-filtro_ms %>% 
-  filter(anio %in% c(1976:1982)) %>% 
-  group_by(anio, orga1, sindicato) %>% 
-  filter(sindicato == "sindicalista") %>% 
-  summarise(n = n()) %>% 
-  mutate(prop = n/sum(n))
-```
-```{r}
-filtro_ms %>% 
-  filter(anio %in% c(1976:1982)) %>% 
-  group_by(sindicato) %>% 
-  filter(sindicato == "sindicalista") %>% 
-  summarise(n = n())
-```
 
 Exploramos la cantidad de víctimas por espacio de militancia y año.
 
@@ -375,7 +329,10 @@ militancias %>%
   arrange(desc(cant_por_militancia)) %>% 
   head(5) %>% 
   ggplot(aes(orga1, cant_por_militancia)) +
-  geom_col()
+  geom_col(aes(fill = orga1)) + 
+  labs(fill = "Espacio de Militancia") +
+  xlab("Espacio de Militancia") +
+  ylab("Cantidad de víctimas")
 ```
 
 ```{r}
@@ -417,7 +374,7 @@ victimas_denuncia %>%
 
 El dataframe victimas_denuncia contiene 8.753 observaciones y 6 variables.
 
-Exploración por edad. A diferencia del dataframe con el que trabajamos anteriormente, en este los años son de tipo numérico.
+Exploración por edad. A diferencia del dataframe con el que trabajamos anteriormente en el cual la variable de la edad de las víctimas es de tipo caracter, en este es de tipo numérico.
 
 ```{r}
 victimas_denuncia %>% 
@@ -425,7 +382,8 @@ victimas_denuncia %>%
   summarise(cantidad = n()) %>% 
   arrange(desc(cantidad)) %>% 
   ggplot(aes(edad_al_momento_del_hecho_numerico, cantidad)) + 
-  geom_col()
+  geom_col() + 
+  labs(x = "Edad", y = "Cantidad de víctimas")
 ```
 
 Buscamos el promedio, el valor máximo, el valor mínimo y el desvío estándar de la edad.
@@ -461,11 +419,14 @@ victimas_parque %>%
   summarise(victimas_por_anio = n()) %>% 
   arrange(desc(victimas_por_anio)) %>% 
   ggplot(aes(anio, victimas_por_anio)) + 
-  geom_col()
+  geom_col() + 
+  labs(x = "Año", y = "Cantidad de víctimas")
+         
 ```
 
 Tomamos la decisión de tomar los años 1976 y 1977 porque estos años contienen la mayoría de los casos, lo que nos permitirá entender las características identitarias de las víctimas.
 
+Año 1976
 ```{r}
 victimas_parque %>%
   group_by(fecha_de_secuestro) %>% 
@@ -476,9 +437,11 @@ victimas_parque %>%
   summarise(victimas_por_anio = n()) %>% 
   arrange(desc(victimas_por_anio)) %>% 
   ggplot(aes(edad, victimas_por_anio)) + 
-  geom_col()
+  geom_col() + 
+  labs(x = "Edad", y = "Cantidad de víctimas")
 ```
 
+Año 1977
 ```{r}
 victimas_parque %>%
   group_by(fecha_de_secuestro) %>% 
@@ -493,7 +456,7 @@ victimas_parque %>%
 ```
 
 
-Creo dataset de victimas por edad y ocupacion entre 1978 y 1982
+Creo dataset de victimas por edad y ocupacion entre 1976 y 1982
 
 ```{r}
 victimas_76_82 <- victimas_parque %>%
@@ -508,7 +471,7 @@ victimas_76_82 <- victimas_parque %>%
 ```
 
 
-
+Cantidad de víctimas desde 1976 a 1982
 ```{r}
 victimas_76_82 %>% 
   group_by(anio) %>% 
@@ -524,7 +487,8 @@ victimas_76_82 %>%
   summarise(victimas_por_anio = n()) %>% 
   arrange(desc(victimas_por_anio)) %>% 
   ggplot(aes(anio, victimas_por_anio)) +
-  geom_col(aes(fill = edad), position = "dodge")
+  geom_col(aes(fill = edad), position = "dodge") + 
+  labs(x = "Año", y = "Cantidad de víctimas", fill = "Edad")
 ```
 
 También nos preguntamos cómo varió la edad y ocupación de las víctimas entre los años 1978 y 1982. Si disminuyó el número de secuestros y/o asesinatos, pensar en posibles respuestas que indiquen esta característica.
@@ -541,7 +505,7 @@ ocupaciones <- victimas_76_82 %>%
   is.na(ocupaciones)                      ~ as.character(NA)))
 ```
 
-Queremos introducir la proporción de estudiantes sobre la cantidad total de víctimas
+Queremos introducir la proporción de estudiantes sobre la cantidad total de víctimas desde 1976 hasta 1982.
 ```{r}
 ocupaciones %>% 
   group_by(ocupaciones) %>% 
@@ -551,7 +515,7 @@ ocupaciones %>%
   gt::gt()
 ```
 
-Procedemos a visualizarlo mediante un gráfico
+Procedemos a visualizarlo mediante un gráfico, a través de los años del golpe cívico militar.
 ```{r}
 ocupaciones %>% 
   group_by(ocupaciones, anio) %>% 
@@ -559,15 +523,19 @@ ocupaciones %>%
   summarise(n = n()) %>% 
   mutate(prop = n/sum(n)) %>% 
   ggplot(aes(anio, prop)) + 
-  geom_col(aes(fill = n))
+  geom_col(aes(fill = prop)) + 
+  labs(x = "Año", y = "Estudiantes", fill = "Proporción")
 ```
+
+
 ```{r}
 ocupaciones %>% 
-  group_by(ocupaciones, anio) %>% 
+  group_by(ocupaciones, anio) %>%
   summarise(n = n()) %>% 
   mutate(prop = n/sum(n)) %>% 
   ggplot(aes(anio, prop)) + 
-  geom_col(aes(fill = ocupaciones), position = "dodge")
+  geom_col(aes(fill = ocupaciones), position = "dodge") +
+  labs(x = "Año", y = "Proporción", fill = "Ocupaciones" )
 ```
 
 
@@ -580,10 +548,57 @@ Las primeras cinco ciudades con más desaparecidos son Capital Federal, Córdoba
 
 Dicho lo anterior, nuestra hipótesis se pregunta cuál fue la variable identitaria que más se repite en las víctimas y cuál es su relación con el lugar del hecho y el año en que ocurrieron.
 
-variable identitaria más repetida y su relación con el lugar del hecho y el año en que ocurrieron
+
+#ALbe, esto forma parte de la conclusión
+```{r}
+militancia_sindical <- militancias %>% 
+  group_by(edad, fecha_de_secuestro, orga1, orga2, orga3, orga4) %>% 
+  summarise(cant_por_militancia = n()) %>% 
+  arrange(desc(cant_por_militancia))
+```
+
 
 ```{r}
+filtro_ms <- militancia_sindical %>% 
+  group_by(fecha_de_secuestro) %>% 
+  mutate(fecha = dmy(fecha_de_secuestro)) %>% 
+  mutate(anio = year(fecha)) %>% 
+  group_by(edad, anio, orga1) %>% 
+  summarise(cant_por_militancia = n()) %>% 
+  arrange(desc(cant_por_militancia)) %>% 
+  mutate(sindicato = case_when(
+  stringr::str_detect(orga1, "Sind") ~ "sindicalista",
+  stringr::str_detect(orga1, "sind") ~ "sindicalista",
+  stringr::str_detect(orga1, "Delega") ~ "sindicalista",
+  stringr::str_detect(orga1, "delega") ~ "sindicalista",
+  stringr::str_detect(orga1, "ATE") ~ "sindicalista",
+  stringr::str_detect(orga1, "UOCRA") ~ "sindicalista",
+  stringr::str_detect(orga1, "Obrer") ~ "sindicalista",
+  stringr::str_detect(orga1, "obrer") ~ "sindicalista",
+  stringr::str_detect(orga1, "Trab") ~ "sindicalista",
+  stringr::str_detect(orga1, "trab") ~ "sindicalista",
+  stringr::str_detect(orga1, "UOM") ~ "sindicalista",
+  stringr::str_detect(orga1, "CGT") ~ "sindicalista",
+  stringr::str_detect(orga1, "UTA") ~ "sindicalista",
+  stringr::str_detect(orga1, "UPCN") ~ "sindicalista",
+  stringr::str_detect(orga1, "Grem") ~ "sindicalista",
+  stringr::str_detect(orga1, "grem") ~ "sindicalista"))
+```
 
+```{r}
+filtro_ms %>% 
+  filter(anio %in% c(1976:1982)) %>% 
+  group_by(anio, orga1, sindicato) %>% 
+  filter(sindicato == "sindicalista") %>% 
+  summarise(n = n()) %>% 
+  mutate(prop = n/sum(n))
+```
+```{r}
+filtro_ms %>% 
+  filter(anio %in% c(1976:1982)) %>% 
+  group_by(sindicato) %>% 
+  filter(sindicato == "sindicalista") %>% 
+  summarise(n = n())
 ```
 
 
