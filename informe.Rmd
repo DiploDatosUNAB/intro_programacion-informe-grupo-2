@@ -1,5 +1,5 @@
 ---
-title: "Prueba de Presentes"
+title: "Presentes"
 author: "Alberto Sabá Fernandez Robles y Clara Bonpland Mignaquy"
 output:
   html_document:
@@ -80,23 +80,6 @@ victimas_parque %>%
   gt::gt()
 ```
 
-```{r}
-sexo_victimas_parque <- victimas_parque %>% 
-  select(edad, sexo) %>% 
-  arrange(desc(edad)) %>% 
-  group_by(sexo) %>% 
-  count(sexo)
-```
-
-Graficamos lo anterior.
-```{r}
-sexo_victimas_parque %>% 
-  ggplot(aes(sexo, n)) +
-  geom_col(aes(fill = sexo), position = "dodge")
-```
-
-# esto lo pongo en grafico mejor? 
-## Lo puse en un gráfico? Si queda raro, lo sacamos.
 
 Exploración por edad de las victimas.
 
@@ -105,16 +88,50 @@ pw_vp <- victimas_parque %>%
   filter(edad != "-") %>% 
   group_by(edad = as.numeric(edad)) %>% 
   summarise(cantidad = n()) %>% 
-  arrange(desc(cantidad)) %>% 
+  arrange(edad) %>% 
   rename("Víctimas" = cantidad, "Edad" = edad)
 ```
 
-## INCLUÍ EL PIVOT WIDER (se puede sacar)
-
+Horizontalizamos la tabla de edad.
 ```{r}
 pw_vp %>% 
   pivot_wider(names_from = Edad,
-              values_from = Víctimas)
+              values_from = Víctimas) %>% 
+  gt::gt()
+```
+
+```{r}
+victimas_parque %>% 
+  group_by(edad = as.numeric(edad)) %>% 
+  summarise(cantidad = n()) %>% 
+  arrange(desc(cantidad)) %>% 
+  ggplot(aes(edad, cantidad)) + 
+  geom_col()
+```
+
+```{r}
+victimas_parque %>% 
+  mutate(edad = as.numeric(edad)) %>% 
+  summarise(edad_max = max(edad, na.rm = TRUE), 
+            edad_min = min(edad, na.rm = TRUE), 
+            edad_media = mean(edad, na.rm = TRUE),
+            edad_sd = sd(edad, na.rm = TRUE)) %>% 
+  rename("Edad máxima" = edad_max, 
+         "Edad mínima" = edad_min, 
+         "Edad media" = edad_media, 
+         "Desviación estándar" = edad_sd)
+```
+
+
+Filtramos víctimas por edad universitaria.
+
+```{r}
+victimas_parque %>%
+  filter(edad %in% c(19:27)) %>% 
+  group_by(edad) %>% 
+  summarise(cant_vict_edad = n())  %>% 
+  rename("Edad" = edad, "Víctimas" = cant_vict_edad) %>% 
+  gt::gt()
 ```
 
 
@@ -142,6 +159,7 @@ victimas_parque %>%
   geom_col(aes(color = sexo)) +
   xlab("Edad") + ylab("Cantidad de víctimas")
 ```
+
 
 También exploramos por edad y ocupaciones de las víctimas.
 
@@ -233,41 +251,6 @@ victimas_parque %>%
   rename("Edad" = edad, "Año de secuestro/asesinato" = anio, "Ocupaciones" = ocupaciones, "Víctimas" = victimas_por_anio)
 ```
 
-```{r}
-victimas_parque %>% 
-  group_by(edad = as.numeric(edad)) %>% 
-  summarise(cantidad = n()) %>% 
-  arrange(desc(cantidad)) %>% 
-  ggplot(aes(edad, cantidad)) + 
-  geom_col()
-```
-
-```{r}
-victimas_parque %>% 
-  mutate(edad = as.numeric(edad)) %>% 
-  summarise(edad_max = max(edad, na.rm = TRUE), 
-            edad_min = min(edad, na.rm = TRUE), 
-            edad_media = mean(edad, na.rm = TRUE),
-            edad_sd = sd(edad, na.rm = TRUE)) %>% 
-  rename("Edad máxima" = edad_max, 
-         "Edad mínima" = edad_min, 
-         "Edad media" = edad_media, 
-         "Desviación estándar" = edad_sd)
-```
-
-Para profundizar el análisis, decidimos incorporar el dataframe victimas_denuncia.
-
-
-Filtramos víctimas por edad universitaria.
-
-```{r}
-victimas_parque %>%
-  filter(edad %in% c(19:27)) %>% 
-  group_by(edad) %>% 
-  summarise(cant_vict_edad = n())  %>% 
-  rename("Edad" = edad, "Víctimas" = cant_vict_edad) %>% 
-  gt::gt()
-```
 
 Nos pareció interesante conocer los espacios de militancia de las víctimas.
 Como la variable de espacios de militancia es una tabla, y una persona puede pertenecer a más de un espacio, tuvimos que desanidar la tabla y explorarla.
@@ -293,16 +276,6 @@ Observamos que estos espacios de militancia pueden ser partidarios, de actividad
   arrange(desc(cant_por_militancia)) 
 ```
 
-Exploramos la cantidad de víctimas por espacio de militancia y año.
-
-```{r}
-militancias %>%  
-  mutate(fecha = dmy(fecha_de_secuestro)) %>% 
-  mutate(anio = year(fecha)) %>% 
-  group_by(anio, orga1, orga2, orga3, orga4) %>% 
-  summarise(cant_por_militancia = n()) %>% 
-  arrange(desc(cant_por_militancia)) 
-```
 
 Cruzamos la cantidad de víctimas por espacios de militancia y sus ocupaciones.
 
@@ -342,23 +315,8 @@ victimas_parque %>%
   rename("Lugar de secuestro" = lugar_de_secuestro, "Víctimas" = cantidad_lugar)
 ```
 
-Cruzamos los lugares de secuestro con las ocupaciones y la edad de las víctimas.
-
-```{r}
-victimas_parque %>% 
-  group_by(fecha_de_secuestro) %>% 
-  mutate(fecha = dmy(fecha_de_secuestro)) %>% 
-  mutate(anio = year(fecha)) %>% 
-  filter(anio %in% c(1976:1982)) %>%
-  filter(!is.na(lugar_de_secuestro)) %>% 
-  group_by(lugar_de_secuestro, ocupaciones, edad) %>%
-  summarise(cantidad_lugar = n()) %>% 
-  arrange(desc(cantidad_lugar)) %>% 
-  rename("Lugar de secuestro" = lugar_de_secuestro, "Ocupaciones" = ocupaciones, "Edad" = edad, "Víctimas" = cantidad_lugar)
-```
-
 Resulta interesante que la ciudad de Mar de Plata se encuentra en 6° lugar de la tabla, por lo que buscamos las ocupaciones de las víctimas en el lugar. 
-De acuerdo a lo explorado, nos resulta signifitiva la variable identitaria de estudiante. Cuando exploramos los lugares de secuestro, pensamos en las ciudades como universitaria. Nos llama la atencion que Mar del Plata esté en el sexto lugar de mayor cantidad de victimas, porque no consideramos que sea una ciudad universitaria.
+De acuerdo a lo explorado, nos resulta signifitiva la variable identitaria de estudiante. Cuando exploramos los lugares de secuestro, pensamos en las ciudades como universitarias. Nos llama la atención que Mar del Plata esté en el sexto lugar de mayor cantidad de victimas, porque no consideramos que sea una ciudad universitaria.
 
 Buscamos qué ocupaciones tienen las víctimas. 
 
@@ -393,9 +351,8 @@ victimas_parque %>%
   arrange(desc(cantidad_lugar)) 
 ```
 
-Como no nos parece significativa la cantidad de victimas estudiantes, decidimos buscar los espacios de militancia de las victimas.
 
-Como pusimos el foco en los estudiantes y consideramos que el resto de las ciudades son universitarias, decidimos filtrar la cantidad de víctimas en Mar del Plata por espacios de militancia.
+Como pusimos el foco en los estudiantes y no nos parece significativa la cantidad de victimas estudiantes, decidimos filtrar por espacios de militancia.
 
 
 ```{r}
@@ -411,6 +368,8 @@ militancias %>%
   theme(axis.text = element_text(size = 5))
 ```
 
+
+Para profundizar el análisis, decidimos incorporar el dataframe victimas_denuncia.
 
 Selección de variables:
 
@@ -469,7 +428,6 @@ La hipótesis planteada es que la mayoría de los desaparecidos eran estudiantes
 En caso de refutarse esta hipótesis, analizaremos cuál es la variable identitaria predominante en las víctimas del terrorismo de Estado de la última dictadura cívico-militar.
 
 
-## Esto no lo respondimos: También nos preguntamos cómo varió la edad y ocupación de las víctimas entre los años 1978 y 1982. Si disminuyó el número de secuestros y/o asesinatos, pensar en posibles respuestas que indiquen esta característica.
 
 ## Blanco sobre negro
 
@@ -492,6 +450,7 @@ victimas_parque %>%
 Tomamos la decisión de tomar los años 1976 y 1977 porque estos años contienen la mayoría de los casos, lo que nos permitirá entender las características identitarias de las víctimas.
 
 Edad de las víctimas
+
 Año 1976
 ```{r}
 victimas_parque %>%
@@ -505,7 +464,8 @@ victimas_parque %>%
   arrange(desc(victimas_por_anio)) %>% 
   ggplot(aes(edad, victimas_por_anio)) + 
   geom_col() + 
-  labs(x = "Edad", y = "Cantidad de víctimas")
+  labs(x = "Edad", y = "Cantidad de víctimas") +
+  theme(axis.text = element_text(size = 5))
 ```
 
 Año 1977
@@ -520,11 +480,12 @@ victimas_parque %>%
   summarise(victimas_por_anio = n()) %>% 
   arrange(desc(victimas_por_anio)) %>% 
   ggplot(aes(edad, victimas_por_anio)) + 
-  geom_col()
+  geom_col() +
+  theme(axis.text = element_text(size = 5))
 ```
 
 
-Creo dataset de victimas por edad y ocupacion entre 1976 y 1982
+Creamos dataset de victimas por edad y ocupacion entre 1976 y 1982.
 
 ```{r}
 victimas_76_82 <- victimas_parque %>%
@@ -545,8 +506,12 @@ victimas_76_82 %>%
   group_by(anio) %>% 
   summarise(cantidad_victimas = n()) %>% 
   summarise(suma = sum(cantidad_victimas)) %>% 
-  rename("Cantidad de víctimas" = suma)
+  rename("Cantidad de víctimas" = suma) %>% 
+  gt::gt()
 ```
+
+También nos preguntamos cómo varió la edad de las víctimas entre los años 1976 y 1982. Si disminuyó el número de secuestros y/o asesinatos, pensar en posibles respuestas que indiquen esta característica.
+
 Edad de las víctimas desde 1976 a 1982.
 
 ```{r}
@@ -560,22 +525,22 @@ victimas_76_82 %>%
   labs(x = "Año", y = "Cantidad de víctimas", fill = "Edad")
 ```
 
-También nos preguntamos cómo varió la edad y ocupación de las víctimas entre los años 1976 y 1982. Si disminuyó el número de secuestros y/o asesinatos, pensar en posibles respuestas que indiquen esta característica.
+Se observa en gamas verdes y naranjas, lo que indica que el rango etario predominante es entre los 20 y 30 años.
 
-¿Cuál es la proporción de militantes cuyas ocupaciones están vinculadas a estudios y cuál vinculadas a la actividad sindical? Y establecer relaciones entre estas variables y los lugares de secuestro y/o asesinato de las víctimas.
+¿Cuál es la proporción de militantes cuyas ocupaciones están vinculadas a estudios y cuál vinculadas a la actividad sindical? Queremos establecer relaciones entre estas variables y los lugares de secuestro y/o asesinato de las víctimas.
 
 
 ## Proporción de ocupaciones
 ```{r}
 ocupaciones <- victimas_76_82 %>% 
   mutate(ocupaciones = case_when(
-  stringr::str_detect(ocupaciones, "Est") ~ "estudiante",
-  stringr::str_detect(ocupaciones, "est") ~ "estudiante",
+  stringr::str_detect(ocupaciones, "Est") ~ "Estudiante",
+  stringr::str_detect(ocupaciones, "est") ~ "Estudiante",
   is.na(ocupaciones)                      ~ as.character(NA)))
 
 ```
 
-Queremos introducir la proporción de estudiantes sobre la cantidad total de víctimas desde 1976 hasta 1982.
+Introducimos la proporción de estudiantes sobre la cantidad total de víctimas desde 1976 hasta 1982.
 ```{r}
 ocupaciones %>% 
   group_by(ocupaciones) %>% 
@@ -586,11 +551,13 @@ ocupaciones %>%
   gt::gt()
 ```
 
+
+
 Procedemos a visualizarlo mediante un gráfico, a lo largo del golpe cívico militar.
 ```{r}
 ocupaciones %>% 
   group_by(ocupaciones, anio) %>% 
-  filter(ocupaciones == "estudiante") %>% 
+  filter(ocupaciones == "Estudiante") %>% 
   summarise(n = n()) %>% 
   mutate(prop = n/sum(n)) %>% 
   ggplot(aes(anio, prop)) + 
@@ -599,7 +566,6 @@ ocupaciones %>%
 ```
 
 Comparamos la proporción de estudiantes con el total de otras ocupaciones.
-## Esto está bien? porque "ocupaciones" está armada solo con estudiantes y NA, no?
 ```{r}
 ocupaciones %>% 
   group_by(ocupaciones, anio) %>%
@@ -610,8 +576,7 @@ ocupaciones %>%
   labs(x = "Año", y = "Proporción", fill = "Ocupaciones" )
 ```
 
-
-## Buen, acá no dan los mismos numeros que arriba porque en el case when entran victimas como por ej "empleada estudiante derecho"
+**Debajo intentamos demostrar la proporción de ocupaciones de las víctimas durante el período 1976-1982. No dan los mismos números que arriba porque utilizamos case when para encontrar todas las víctimas que además de tener una ocupación laboral, eran estudiantes. Por ejemplo  "empleada estudiante derecho"
 
 ```{r}
 victimas_parque %>% 
@@ -629,17 +594,15 @@ victimas_parque %>%
 
 
 Si bien los estudiantes agrupan una gran cantidad de víctimas, parece ser que no corrobora nuestra hipótesis.
-Agrupando por edad, por año, posee mayor número de víctimas en conjunto que las demás ocupaciones. Lo que resulta de este análisis es que si bien es una variable identiraria representativa, no es la única y no necesariamente la edad universitaria fue un factor a la hora de convertirse en posibles víctimas. 
+Agrupando por edad, por año, posee mayor número de víctimas en conjunto que las demás ocupaciones. Lo que resulta de este análisis es que si bien es una variable identitaria representativa, no es la única y no necesariamente la edad universitaria fue un factor a la hora de convertirse en posibles víctimas. 
   
-## No fue la edad, ¿entonces, qué?
-Las primeras cinco ciudades con más desaparecidos son Capital Federal, Córdoba Capital, La Plata, San Miguel de Tucumán, Rosario y, en un sexto lugar y con más de 200 casos, aparece Mar del Plata. Esto resulta, como mínimo, interesante ya que Mar del Plata no se presenta como una ciudad universitaria.
+## Si no fue la edad, ¿entonces, qué?
+Las primeras cinco ciudades con más desaparecidos son Capital Federal, Córdoba Capital, La Plata, San Miguel de Tucumán, Rosario y, en un sexto lugar y con más de 180 casos, aparece Mar del Plata. Esto resulta, como mínimo, interesante ya que Mar del Plata no se presenta como una ciudad universitaria.
 ¿La variable estudiantes explicaba también los casos ocurridos en las otras cinco ciudades? Debemos incorporar otras categorías al análisis, como son los espacios de militancia. ¿Cuál es la proporción de militantes cuyas ocupaciones están vinculadas a estudios y cuál vinculadas a la actividad sindical? Y establecer relaciones entre estas variables y los lugares de secuestro y/o asesinato de las víctimas.
 
 
-## Dicho lo anterior, nuestra hipótesis se pregunta cuál fue la variable identitaria que más se repite en las víctimas y cuál es su relación con el lugar del hecho y el año en que ocurrieron.
+Dicho lo anterior, nuestra hipótesis se pregunta cuál fue la variable identitaria que más se repite en las víctimas y cuál es su relación con el lugar del hecho y el año en que ocurrieron.
 
-
-#ALbe, esto lo saqué de la exploració, para mi va por acá
 
 ```{r}
 militancia_sindical <- militancias %>% 
@@ -695,16 +658,7 @@ filtro_ms %>%
   rename("Tipo de espacio de militancia" = sindicato, "Cantidad de víctimas" = n )
 ```
 
-De 4276 victimas del 76 al 82, 527 son de actividad sindical, 1147 estudiantes, las 2602 que no son estudiantes ni sindicalistas,  ¿cuántas son y a qué pertenecen?
-```{r}
-filtro_ms %>% 
-  filter(anio %in% c(1976:1982)) %>% 
-  filter(is.na(sindicato)) %>% 
-  group_by(sindicato) %>%
-  summarise(n = n()) 
-```
-
-El detalle de las 919 victimas de arriba
+Víctimas con espacios de militancia partidaria.
 ```{r}
 filtro_ms %>% 
   filter(anio %in% c(1976:1982)) %>% 
@@ -714,22 +668,8 @@ filtro_ms %>%
   arrange(desc(n))
 ```
 
+## Acercándonos al final
 
-##Conclusión:
-
-Lugar de secuestro con espacio de militancia - mar del plata
-```{r}
-militancias %>% 
-  group_by(lugar_de_secuestro, orga1) %>% 
-  filter(lugar_de_secuestro == "MAR DEL PLATA. BS. AS.") %>% 
-  summarise(cant_por_militancia = n()) %>% 
-  arrange(desc(cant_por_militancia)) %>% 
-  head(5) %>% 
-  ggplot(aes(orga1, cant_por_militancia)) +
-  geom_col(aes(fill = orga1)) +
-  labs(x = "Espacio de Militancia", y = "Cantidad de víctimas", fill = "Espacio de Militancia") +
-  theme(axis.text = element_text(size = 5))
-```
 
 ```{r}
 militancia_lugar_secuestro <- militancias %>% 
@@ -737,6 +677,7 @@ militancia_lugar_secuestro <- militancias %>%
   summarise(cant_por_militancia = n()) %>% 
   arrange(desc(cant_por_militancia))
 ```
+
 
 ```{r}
 filtro_lugar <- militancia_lugar_secuestro %>% 
@@ -765,20 +706,6 @@ filtro_lugar <- militancia_lugar_secuestro %>%
   stringr::str_detect(orga1, "grem") ~ "sindicalista"))
 ```
 
-Sindicalistas en Mar del Plata
-```{r}
-filtro_lugar %>% 
-  filter(lugar_de_secuestro == "MAR DEL PLATA. BS. AS.") %>% 
-  group_by(lugar_de_secuestro,orga1) %>% 
-  summarise(n = n()) %>% 
-  arrange(desc(n)) %>% 
-  head(10) %>% 
-  ggplot(aes(orga1, n)) + 
-  geom_col(aes(fill = orga1)) + 
-  labs(x = "Espacio de militancia", y = "Cantidad de víctimas", fill = "Espacio de militancia") + 
-  theme(axis.text = element_text(size = 5))
-  
-```
 
 Sindicalistas en Mar del Plata del 76 al 82
 ```{r}
@@ -796,7 +723,7 @@ filtro_lugar %>%
   
 ```
 
-Tucuman
+Sindicalistas en Tucumán del 76 al 82
 ```{r}
 filtro_lugar %>% 
   filter(anio %in% c(1976:1982)) %>%
@@ -804,10 +731,16 @@ filtro_lugar %>%
   group_by(lugar_de_secuestro, orga1, sindicato) %>% 
   filter(sindicato == "sindicalista") %>% 
   summarise(n = n()) %>% 
-  arrange(desc(n))
+  arrange(desc(n)) %>% 
+  head(10) %>% 
+  ggplot(aes(orga1, n)) + 
+  geom_col(aes(fill = orga1)) + 
+  labs(x = "Espacio de militancia", y = "Cantidad de víctimas", fill = "Espacio de militancia") + 
+  theme(axis.text = element_text(size = 5))
+  
 ```
 
-CAPITAL FEDERAL
+Sindicalistas en Capital Federal del 76 al 82
 ```{r}
 filtro_lugar %>% 
   filter(anio %in% c(1976:1982)) %>%
@@ -816,10 +749,15 @@ filtro_lugar %>%
   filter(sindicato == "sindicalista") %>% 
   summarise(n = n()) %>% 
   arrange(desc(n)) %>% 
-  head(10)
+  head(10) %>% 
+  ggplot(aes(orga1, n)) + 
+  geom_col(aes(fill = orga1)) + 
+  labs(x = "Espacio de militancia", y = "Cantidad de víctimas", fill = "Espacio de militancia") + 
+  theme(axis.text = element_text(size = 5))
+  
 ```
 
-Córdoba
+Sindicalistas en Córdoba Capital del 76 al 82
 ```{r}
 filtro_lugar %>% 
   filter(anio %in% c(1976:1982)) %>%
@@ -828,10 +766,15 @@ filtro_lugar %>%
   filter(sindicato == "sindicalista") %>% 
   summarise(n = n()) %>% 
   arrange(desc(n)) %>% 
-  head(10)
+  head(10) %>% 
+  ggplot(aes(orga1, n)) + 
+  geom_col(aes(fill = orga1)) + 
+  labs(x = "Espacio de militancia", y = "Cantidad de víctimas", fill = "Espacio de militancia") + 
+  theme(axis.text = element_text(size = 5))
+  
 ```
 
-Rosario
+Sindicalistas en Rosario del 76 al 82
 ```{r}
 filtro_lugar %>% 
   filter(anio %in% c(1976:1982)) %>%
@@ -840,39 +783,15 @@ filtro_lugar %>%
   filter(sindicato == "sindicalista") %>% 
   summarise(n = n()) %>% 
   arrange(desc(n)) %>% 
-  head(10)
+  head(10) %>% 
+  ggplot(aes(orga1, n)) + 
+  geom_col(aes(fill = orga1)) + 
+  labs(x = "Espacio de militancia", y = "Cantidad de víctimas", fill = "Espacio de militancia") + 
+  theme(axis.text = element_text(size = 5))
+  
 ```
 
 
-
-## probando codigo para comprara cantidad de victimas por años
-
-```{r}
-anio_real <- victimas_parque %>%
-  group_by(fecha_de_secuestro) %>% 
-  mutate(fecha = dmy(fecha_de_secuestro)) %>% 
-  mutate(anio = year(fecha)) %>% 
-  group_by(anio) %>% 
-  filter(!is.na(anio)) %>% 
-  summarise(victimas_por_anio = n()) %>% 
-  arrange(desc(victimas_por_anio))
-```
-
-```{r}
-anio_monumento <- victimas_parque %>% 
-  group_by(ano_en_monumento) %>% 
-  mutate(anio = as.numeric(ano_en_monumento)) %>% 
-  group_by(anio) %>% 
-  summarise(victimas_por_anio = n()) %>% 
-  arrange(desc(victimas_por_anio)) 
-```
-
-Comparación de cantidad de victimas por año con fecha de secuestro y por año con anio en monumeto
-
-```{r}
-anio_real %>% 
-  left_join(anio_monumento, by = "anio", suffix = c(".anio", ".anio_en_monumento")) 
-```
 
 ## Conclusión finales
 
@@ -889,37 +808,15 @@ No fue hasta el final del trabajo que pudimos observar que la mayoría de las/os
 
 Sin importar la edad, la ocupación, el sexo y afiliación sindical, los desaparecidos eran, ante todo, militantes.
 
-Tiene sentido, teniendo en cuenta que la última dictadura militar lo que vino a hacer es a romper los lazos construidos por la sociedad, atacando todas las formas de organización política.
-
-
-## Extra
-# Nube de palabras con las ciudades
+Tiene sentido, teniendo en cuenta que el plan de la última dictadura militar se centró en romper los lazos construidos por la sociedad, atacando todas las formas de organización política.
 
 ```{r}
-nube <- victimas_parque %>% 
-  select(lugar_de_secuestro)
-  
+ militancias %>% 
+  group_by(orga1) %>% 
+  summarise(cant_por_militancia = n()) %>% 
+  arrange(desc(cant_por_militancia)) %>% 
+  head(20) %>%
+  rename("Espacio de militancia" = orga1, "Cantidad de víctimas" = cant_por_militancia) %>% 
+  gt::gt()
 ```
 
-```{r}
-stopwords_es <- tibble(palabras = tm::stopwords(kind = "es"))
-```
-
-
-```{r}
-quieronube <- nube %>% 
-  unnest_tokens(palabras, lugar_de_secuestro) %>% 
-  anti_join(stopwords_es) %>% 
-  count(palabras) %>% 
-  arrange(desc(n)) %>% 
-  filter(palabras != "as", palabras != "bs", palabras != "domicilio", palabras != "san")
-  
-```
-
-```{r}
-grnube <- head(quieronube,20)
-```
-gráfico
-```{r}
-wordcloud2(grnube, size = 1, minRotation = -pi/6, maxRotation = -pi/6,
-                  color = "random-light", backgroundColor = "white")
